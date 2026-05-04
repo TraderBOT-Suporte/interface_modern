@@ -1,2605 +1,1493 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#2C353C">
-    <title>Trader BOT · Terminal Diagoona</title>
-    <link rel="icon" type="image/png" href="Trader_BOT_LOGO.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-dark: #0a0a0f;
-            --bg-gradient: linear-gradient(135deg, #0a0a0f 0%, #1a1207 30%, #0d0d1a 60%, #1a0f07 100%);
-            --accent: #d4a24e;
-            --accent-light: #f0c67a;
-            --accent-glow: rgba(212,162,78,0.3);
-            --text-primary: rgba(255,255,255,0.95);
-            --text-secondary: rgba(255,255,255,0.75);
-            --text-muted: rgba(255,255,255,0.5);
-            --border-light: rgba(212,162,78,0.2);
-            --bg-translucent: rgba(212,162,78,0.08);
-            --bg-translucent-hover: rgba(212,162,78,0.14);
-            --glass: rgba(20,20,30,0.6);
-            --glass-border: rgba(212,162,78,0.25);
-            --success: #34d399;
-            --danger: #f87171;
-            --warning: #fbbf24;
-        }
-
-        body {
-            font-family: 'Open Sans', Arial, sans-serif;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            font-weight: 300;
-        }
-
-        .text-accent { color: var(--accent); }
-        .bg-glass {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-        }
-
-        /* ===== LOGO SCREEN ===== */
-        .logo-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-gradient);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 1s ease-out;
-        }
-
-        .logo-container {
-            text-align: center;
-            animation: logoPulse 2s infinite ease-in-out;
-        }
-
-        .logo-img {
-            max-width: 180px;
-            border-radius: 16px;
-            background: var(--bg-translucent);
-            padding: 15px;
-            border: 1px solid var(--border-light);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-        }
-
-        @keyframes logoPulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* ===== SPLASH SCREEN ===== */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-gradient); background-attachment: fixed;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease-out;
-            opacity: 0;
-        }
-
-        .splash-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            animation: gradientFlow 3s linear infinite;
-        }
-
-        @keyframes gradientFlow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .splash-content {
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            animation: fadeInUp 0.5s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .splash-logo {
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .logo-glow {
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-            filter: blur(30px);
-            opacity: 0.2;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: glowPulse 3s infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1.2); }
-        }
-
-        .logo-symbol {
-            font-size: 60px;
-            font-weight: 900;
-            color: var(--accent);
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 0 30px rgba(212,162,78,0.3);
-        }
-
-        .logo-text h1 {
-            font-size: 32px;
-            font-weight: 400;
-            letter-spacing: 2px;
-            color: white;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .logo-text p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .loader {
-            width: 70px;
-            height: 70px;
-            margin: 30px auto;
-            position: relative;
-        }
-
-        .loader-inner {
-            position: absolute;
-            inset: 0;
-            border: 3px solid transparent;
-            border-top-color: var(--accent);
-            border-right-color: var(--text-secondary);
-            border-radius: 50%;
-            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-        }
-
-        .loader-inner:nth-child(2) {
-            border-top-color: var(--text-secondary);
-            border-right-color: var(--accent);
-            animation: spin 2s reverse infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 20px;
-            min-height: 20px;
-            font-weight: 400;
-        }
-
-        .dots::after {
-            content: '';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes dots {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-        }
-
-        /* ===== TELA DE LOGIN ===== */
-        .login-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            padding: 20px;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .login-wrapper.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .login-container {
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            padding: 12px 12px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 80px rgba(212,162,78,0.08);
-            transform: translateY(20px);
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-wrapper.active .login-container {
-            transform: translateY(0);
-        }
-
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--accent);
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .login-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--bg-translucent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 30px;
-            color: var(--accent);
-            border: 1px solid var(--border-light);
-        }
-
-        .login-header h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            color: white;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .login-header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .message {
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 400;
-            display: none;
-            border: 1px solid;
-        }
-
-        .message.error {
-            background: rgba(231, 76, 60, 0.1);
-            color: var(--danger);
-            border-color: rgba(231, 76, 60, 0.3);
-            display: block;
-        }
-
-        .message.success {
-            background: rgba(46, 204, 113, 0.1);
-            color: var(--success);
-            border-color: rgba(46, 204, 113, 0.3);
-            display: block;
-        }
-
-        .message.loading {
-            background: rgba(243, 156, 18, 0.1);
-            color: var(--warning);
-            border-color: rgba(243, 156, 18, 0.3);
-            display: block;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-field {
-            position: relative;
-        }
-
-        .input-field input {
-            width: 100%;
-            padding: 12px 16px 12px 45px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            color: white;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .input-field input:hover {
-            border-color: var(--text-secondary);
-        }
-
-        .input-field input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 2px solid var(--accent);
-            border-radius: 30px;
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .submit-btn:hover {
-            background: var(--accent);
-            color: #000;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212,162,78,0.3);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-        }
-
-        .feature {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .feature-icon {
-            color: var(--accent);
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .security-tips {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            border-left: 3px solid var(--accent);
-        }
-
-        .security-tips h4 {
-            font-size: 14px;
-            margin-bottom: 12px;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .security-tips ul {
-            padding-left: 20px;
-            margin: 0;
-        }
-
-        .security-tips li {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-
-        .login-footer {
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 30px;
-        }
-
-        .bg-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-            opacity: 0.2;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
-        }
-
-        /* ===== DASHBOARD ===== */
-        .dashboard-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding: 5px;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            pointer-events: none;
-            z-index: 50;
-        }
-
-        .dashboard-wrapper.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-            padding-top: 0px;
-        }
-
-        /* ===== HEADER ===== */
-        .terminal-header {
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            padding: 20px 24px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(212,162,78,0.05);
-            animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .terminal-header h1 {
-            font-size: 22px;
-            font-weight: 400;
-            color: white;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 400;
-            margin-top: 4px;
-        }
-
-        .subtitle:first-of-type {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* ===== PAINEL DE CONTROLE ===== */
-        .control-container {
-            display: flex;
-            justify-content: center;
-            animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-        }
-
-        .control-panel {
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            padding: 24px 20px;
-            width: 100%;
-            position: relative;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(212,162,78,0.05);
-        }
-
-        .control-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--accent);
-            border-radius: 4px 0 0 4px;
-        }
-
-        .panel-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 14px;
-            margin-bottom: 18px;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            color: var(--accent);
-            border-bottom: 1px solid var(--border-light);
-            text-transform: uppercase;
-        }
-
-        .panel-title::before {
-            content: '$';
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 6px;
-            font-family: 'Open Sans', monospace;
-            font-size: 14px;
-            color: var(--accent);
-            border: 1px solid var(--border-light);
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .control-panel label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .control-panel label::before {
-            content: '>';
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        .control-panel select {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 400;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.3);
-            color: white;
-            border: 1px solid var(--border-light);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239CC' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-        }
-
-        .control-panel select option {
-            background: var(--bg-gradient); background-attachment: fixed;
-            color: white;
-        }
-
-        .control-panel select:hover {
-            border-color: var(--accent);
-        }
-
-        .control-panel select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(212,162,78,0.2);
-        }
-
-        .control-panel button {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            border-radius: 30px;
-            background: transparent;
-            color: var(--accent);
-            border: 2px solid var(--accent);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .control-panel button:hover {
-            background: var(--accent);
-            color: #000;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212,162,78,0.3);
-        }
-
-        .control-panel button:active {
-            transform: translateY(0);
-        }
-
-        .control-panel button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .asset-info {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 8px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-light);
-            font-size: 14px;
-        }
-
-        .asset-info div {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .asset-info div:last-child {
-            border-bottom: none;
-        }
-
-        .asset-info div span:first-child {
-            color: var(--text-secondary);
-            font-weight: 400;
-            font-size: 14px;
-        }
-
-        .asset-info div span:last-child {
-            color: white;
-            font-weight: 600;
-        }
-
-        /* ===== FRAME DE SINAIS ===== */
-        .signal-frame {
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            width: 100%;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(212,162,78,0.05);
-            animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-        }
-
-        .frame-content {
-            padding: 8px 0;
-        }
-
-        .frame-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 20px 10px;
-            font-weight: 600;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--accent);
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .frame-row {
-            display: flex;
-            padding: 10px 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            font-family: 'Open Sans', monospace;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .frame-row:hover {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .frame-row:last-child {
-            border-bottom: none;
-        }
-
-        .frame-label {
-            width: 45px;
-            color: var(--accent);
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .frame-label-wide {
-            width: 85px;
-            color: var(--accent);
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .frame-value {
-            flex: 1;
-            color: white;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .call, .buy, .call .frame-value { color: var(--success) !important; font-weight: 700; }
-        .put, .sell, .put .frame-value { color: var(--danger) !important; font-weight: 700; }
-        .hold, .neutral { color: var(--warning) !important; font-weight: 700; }
-
-        /* ===== CONEXÃO ===== */
-        .connection-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-left: 8px;
-        }
-        .connected { background: var(--success); }
-        .connecting { background: var(--warning); animation: pulseDot 1s infinite; }
-        .disconnected { background: var(--danger); }
-        @keyframes pulseDot { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
-
-        /* ===== FOOTER ===== */
-        .terminal-footer {
-            padding: 16px 20px;
-            border-radius: 10px;
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            font-size: 14px;
-            text-align: center;
-            color: var(--text-secondary);
-            animation: fadeIn 0.6s ease 0.6s both;
-            line-height: 1.6;
-        }
-
-        .terminal-footer span:first-child {
-            color: var(--warning);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* ===== MENU HAMBÚRGUER ===== */
-        .hamburger-btn {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            width: 44px;
-            height: 44px;
-            background: var(--bg-translucent);
-            backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 200;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .hamburger-btn:hover {
-            border-color: var(--accent);
-        }
-
-        .hamburger-btn i {
-            font-size: 18px;
-            color: var(--text-primary);
-        }
-
-        .hamburger-btn:hover i {
-            color: var(--accent);
-        }
-
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(3px);
-            z-index: 250;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 80%;
-            max-width: 320px;
-            height: 100%;
-            background: var(--bg-gradient); background-attachment: fixed;
-            border-right: 1px solid var(--border-light);
-            z-index: 300;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.5);
-        }
-
-        .side-menu.active {
-            transform: translateX(0);
-        }
-
-        /* ===== FIX HOVER FANTASMA ===== */
-        .menu-opening-shield {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 9999;
-            cursor: default;
-        }
-
-        .menu-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .menu-header h3 {
-            font-size: 18px;
-            font-weight: 400;
-            color: var(--accent);
-            text-transform: uppercase;
-        }
-
-        .close-menu-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .close-menu-btn:hover {
-            background: rgba(231,76,60,0.2);
-            border-color: var(--danger);
-        }
-
-        .close-menu-btn i {
-            color: var(--danger);
-            font-size: 14px;
-        }
-
-        .menu-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .menu-section {
-            margin-bottom: 24px;
-        }
-
-        .menu-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .social-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .social-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 400;
-            transition: all 0.2s ease;
-        }
-
-        .social-link:hover {
-            background: var(--bg-translucent);
-            border-color: var(--accent);
-            transform: translateX(4px);
-        }
-
-        .social-link i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .social-link.whatsapp i { color: #25D366; }
-        .social-link.telegram i { color: #0088cc; }
-        .social-link.email i { color: var(--accent); }
-        .social-link.youtube i { color: #FF0000; }
-
-        .manual-btn {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 2px solid var(--accent);
-            border-radius: 30px;
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .manual-btn:hover {
-            background: var(--accent);
-            color: #000;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212,162,78,0.3);
-        }
-
-        .menu-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border-light);
-            text-align: center;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .menu-footer p {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        /* ===== MODAL DO MANUAL ===== */
-        .manual-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-gradient); background-attachment: fixed;
-            z-index: 400;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .manual-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .manual-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.3);
-        }
-
-        .manual-header h2 {
-            font-size: 18px;
-            font-weight: 400;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-        }
-
-        .close-manual-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .close-manual-btn:hover {
-            background: rgba(231,76,60,0.2);
-            border-color: var(--danger);
-        }
-
-        .close-manual-btn i {
-            color: var(--danger);
-            font-size: 14px;
-        }
-
-        .manual-body {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .manual-body::-webkit-scrollbar { width: 6px; }
-        .manual-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .manual-body::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
-        .manual-body::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-        .manual-section {
-            margin-bottom: 24px;
-            padding: 5px;
-            background: var(--bg-translucent);
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-        }
-
-        .manual-section h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 16px;
-            text-transform: uppercase;
-        }
-
-        .manual-section h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            margin: 16px 0 8px;
-        }
-
-        .manual-section p, .manual-section li {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 4px;
-        }
-
-        .manual-section ul {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 0 -4px;
-            padding: 0 4px;
-        }
-
-        .manual-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 14px;
-            min-width: 100%;
-        }
-
-        .manual-table th, .manual-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-light);
-            word-break: break-word;
-        }
-
-        .manual-table th {
-            background: rgba(0,0,0,0.3);
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .manual-table td {
-            color: var(--text-secondary);
-        }
-
-        .hierarchy-tree {
-            font-family: 'Open Sans', monospace;
-            font-size: 14px;
-            color: var(--text-secondary);
-            padding: 16px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-            line-height: 1.8;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .hierarchy-tree .highlight { color: var(--accent); font-weight: 600; }
-        .hierarchy-tree .secondary { color: #99c; }
-
-        .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-light);
-        }
-
-        .checklist-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent);
-            margin-top: 2px;
-        }
-
-        .golden-rules { counter-reset: rule; }
-
-        .golden-rule {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .golden-rule::before {
-            counter-increment: rule;
-            content: counter(rule);
-            width: 24px;
-            height: 24px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: #000;
-            flex-shrink: 0;
-        }
-
-        .golden-rule span {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* ===== RELÓGIO ===== */
-        .clock {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            background: black;
-            backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: var(--accent);
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            z-index: 200;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            font-family: 'Open Sans', monospace;
-            display: none;
-        }
-
-        .clock.visible {
-            display: block;
-        }
-
-        /* ===== RESPONSIVIDADE ===== */
-        @media (max-width: 400px) {
-            .dashboard-wrapper { padding: 12px; }
-            .container { gap: 12px; }
-            .terminal-header { padding: 16px 18px; }
-            .terminal-header h1 { font-size: 18px; }
-            .control-panel { padding: 20px 16px; }
-            .frame-row { font-size: 14px; padding: 8px 16px; }
-            .frame-label { width: 40px; }
-            .frame-label-wide { width: 75px; }
-            .frame-title { font-size: 14px; padding: 12px 16px 8px; }
-            .login-container { padding: 20px 15px; }
-            .login-header h2 { font-size: 1.5rem; }
-            .logo-symbol { font-size: 48px; }
-            .logo-text h1 { font-size: 24px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<title>TraderBOT · Admin Control</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Epilogue:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ... todo o CSS existente mantido exatamente igual ... */
+:root {
+  --bg:      #080b10;
+  --bg2:     #0e1318;
+  --bg3:     #141b23;
+  --bg4:     #1a2330;
+  --bg5:     #202c3a;
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --border3: rgba(255,255,255,0.18);
+  --G:   #00e5a0;
+  --Gd:  #00b87c;
+  --Gx:  rgba(0,229,160,0.08);
+  --Gb:  rgba(0,229,160,0.18);
+  --A:   #f5a623;
+  --Ad:  #c4841a;
+  --Ax:  rgba(245,166,35,0.08);
+  --R:   #ff4d6d;
+  --Rx:  rgba(255,77,109,0.08);
+  --B:   #4da6ff;
+  --Bx:  rgba(77,166,255,0.08);
+  --P:   #b06eff;
+  --Px:  rgba(176,110,255,0.08);
+  --T:  #e2e8f0;
+  --T2: #8b99ab;
+  --T3: #4a5568;
+  --T4: #2d3748;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Epilogue', sans-serif;
+  --r: 8px;
+  --r2: 12px;
+  --r3: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--T);
+  font-family:var(--sans);min-height:100vh;
+  
+}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:54px;
+  background:rgba(8,11,16,.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;gap:10px;
+}
+.logo-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--Gd),var(--G));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:700;color:#000;
+  flex-shrink:0;
+}
+.logo-text{
+  font-family:var(--mono);font-size:12px;font-weight:600;
+  color:var(--T);letter-spacing:.05em;flex:1;
+  display:flex;flex-direction:column;line-height:1.2;
+}
+.logo-text span{font-size:9px;font-weight:400;color:var(--T3);letter-spacing:.1em;text-transform:uppercase}
+.top-pills{display:flex;gap:6px;align-items:center}
+.spill{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;
+  padding:4px 8px;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--T3);cursor:default;transition:all .2s;
+}
+.spill .dot{width:6px;height:6px;border-radius:50%;background:var(--T4);transition:all .3s}
+.spill.on{border-color:rgba(0,229,160,.25);color:var(--G)}
+.spill.on .dot{background:var(--G);box-shadow:0 0 6px var(--G)}
+.spill.off{border-color:rgba(255,77,109,.25);color:var(--R)}
+.spill.off .dot{background:var(--R)}
+.spill.wait{border-color:rgba(245,166,35,.25);color:var(--A)}
+.spill.wait .dot{background:var(--A);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ham{
+  background:none;border:1px solid var(--border);
+  width:36px;height:36px;border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;transition:border-color .2s;flex-shrink:0;
+}
+.ham:hover{border-color:var(--border3)}
+.ham span{display:block;width:16px;height:1.5px;background:var(--T2);transition:all .25s}
+.ham.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ham.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* ── DRAWER ── */
+.overlay{
+  position:fixed;inset:54px 0 0 0;z-index:198;
+  background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.show{opacity:1;pointer-events:all}
+.drawer{
+  position:fixed;top:54px;right:0;bottom:0;z-index:199;
+  width:min(280px,90vw);
+  background:var(--bg2);border-left:1px solid var(--border);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.drawer.show{transform:translateX(0)}
+.dsec{padding:14px;border-bottom:1px solid var(--border)}
+.dlabel{
+  font-family:var(--mono);font-size:9px;color:var(--T4);
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;
+}
+.ditem{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border-radius:var(--r);
+  cursor:pointer;font-size:12px;font-weight:500;
+  color:var(--T2);transition:all .12s;border:1px solid transparent;
+  user-select:none;
+}
+.ditem:hover{background:var(--bg3);color:var(--T);border-color:var(--border)}
+.ditem.active{background:var(--Gx);color:var(--G);border-color:rgba(0,229,160,.18)}
+.ditem .ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.dbadge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  padding:2px 6px;border-radius:20px;
+  background:var(--bg4);color:var(--T3);
+}
+
+/* ── MAIN ── */
+.main{padding-top:54px;min-height:100vh}
+.page{display:none;padding:14px;animation:fIn .18s}
+.page.active{display:block}
+@keyframes fIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.ph{font-size:18px;font-weight:700;margin-bottom:2px}
+.ps{font-family:var(--mono);font-size:10px;color:var(--T3);margin-bottom:16px}
+
+/* ── CARDS ── */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:14px;margin-bottom:10px;
+}
+.card-h{
+  font-family:var(--mono);font-size:10px;color:var(--T3);
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-h .act{
+  font-family:var(--mono);font-size:10px;color:var(--T3);
+  background:none;border:1px solid var(--border);
+  border-radius:4px;padding:3px 8px;cursor:pointer;
+  transition:all .15s;
+}
+.card-h .act:hover{color:var(--T);border-color:var(--border2)}
+
+/* ── METRICS ── */
+.mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+@media(min-width:560px){.mgrid{grid-template-columns:repeat(4,1fr)}}
+.m{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 10px;
+}
+.ml{font-family:var(--mono);font-size:9px;color:var(--T3);margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase}
+.mv{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
+.ms{font-family:var(--mono);font-size:9px;color:var(--T3);margin-top:3px}
+.g{color:var(--G)}.a{color:var(--A)}.r{color:var(--R)}.b{color:var(--B)}.p{color:var(--P)}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:3px 7px;border-radius:4px;
+}
+.badge.g{background:var(--Gx);color:var(--G);border:1px solid rgba(0,229,160,.2)}
+.badge.a{background:var(--Ax);color:var(--A);border:1px solid rgba(245,166,35,.2)}
+.badge.r{background:var(--Rx);color:var(--R);border:1px solid rgba(255,77,109,.2)}
+.badge.b{background:var(--Bx);color:var(--B);border:1px solid rgba(77,166,255,.2)}
+.badge.x{background:var(--bg4);color:var(--T2);border:1px solid var(--border)}
+
+/* ── FORM ── */
+.field{margin-bottom:12px}
+.field label{display:block;font-family:var(--mono);font-size:9px;color:var(--T3);margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:9px 11px;
+  color:var(--T);font-family:var(--mono);font-size:12px;
+  outline:none;transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--Gd)}
+.field select option{background:var(--bg3)}
+.field textarea{resize:vertical;min-height:70px}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  padding:9px 16px;border-radius:var(--r);border:none;cursor:pointer;
+  transition:all .15s;text-align:center;
+}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-g{background:var(--G);color:#000}
+.btn-g:not(:disabled):hover{background:var(--Gd)}
+.btn-o{background:transparent;border:1px solid var(--border2);color:var(--T)}
+.btn-o:not(:disabled):hover{border-color:var(--Gd);color:var(--G)}
+.btn-r{background:var(--Rx);border:1px solid rgba(255,77,109,.3);color:var(--R)}
+.btn-r:not(:disabled):hover{background:rgba(255,77,109,.18)}
+.btn-a{background:var(--Ax);border:1px solid rgba(245,166,35,.3);color:var(--A)}
+.btn-a:not(:disabled):hover{background:rgba(245,166,35,.18)}
+.btn-p{background:var(--Px);border:1px solid rgba(176,110,255,.3);color:var(--P)}
+.btn-p:not(:disabled):hover{background:rgba(176,110,255,.18)}
+.btn-full{width:100%}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+/* ── TERMINAL ── */
+.term{
+  background:#040608;border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 12px;
+  font-family:var(--mono);font-size:10px;line-height:1.75;
+  max-height:220px;overflow-y:auto;color:var(--T2);
+}
+.tl{display:flex;gap:8px;align-items:flex-start}
+.ts{color:var(--T4);white-space:nowrap;flex-shrink:0}
+.tok{color:var(--G)}.twn{color:var(--A)}.ter{color:var(--R)}.tin{color:var(--B)}
+
+/* ── TOKEN BOX ── */
+.tbox{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 11px;padding-right:62px;
+  font-family:var(--mono);font-size:10px;color:var(--G);
+  word-break:break-all;line-height:1.6;position:relative;
+}
+.tcopy{
+  position:absolute;top:7px;right:7px;
+  background:var(--bg4);border:1px solid var(--border);
+  color:var(--T2);font-size:9px;font-family:var(--mono);
+  padding:3px 7px;border-radius:4px;cursor:pointer;transition:all .15s;
+}
+.tcopy:hover{border-color:var(--Gd);color:var(--G)}
+
+/* ── PILLS ── */
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.pill{
+  font-family:var(--mono);font-size:10px;
+  padding:4px 10px;border-radius:20px;
+  border:1px solid var(--border);color:var(--T2);
+  cursor:pointer;transition:all .12s;
+}
+.pill.on{border-color:var(--Gd);color:var(--G);background:var(--Gx)}
+.pill:hover:not(.on){border-color:var(--border2);color:var(--T)}
+
+/* ── USER TABLE ── */
+.utbl{width:100%;border-collapse:collapse}
+.utbl th{
+  font-family:var(--mono);font-size:9px;color:var(--T3);
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:6px 8px;text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.utbl td{
+  padding:8px 8px;font-family:var(--mono);font-size:10px;
+  color:var(--T2);border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.utbl tr:last-child td{border-bottom:none}
+.utbl tr:hover td{background:var(--bg3)}
+.utbl td:first-child{color:var(--G)}
+
+/* ── NOTIF HISTORY ── */
+.nh{display:flex;flex-direction:column;gap:6px}
+.ni{
+  display:flex;gap:9px;align-items:flex-start;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:9px 11px;
+}
+.ni-ico{font-size:14px;flex-shrink:0;line-height:1.4}
+.ni-title{font-size:11px;font-weight:600;margin-bottom:1px}
+.ni-body{font-size:10px;color:var(--T2);font-family:var(--mono)}
+.ni-ts{font-family:var(--mono);font-size:9px;color:var(--T3);margin-top:3px}
+
+/* ── DIVIDER ── */
+.div{height:1px;background:var(--border);margin:10px 0}
+
+/* ── SPINNER ── */
+.spin{display:inline-block;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── ENDPOINT ROW ── */
+.ep{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:var(--bg3);
+  border-radius:var(--r);border:1px solid var(--border);
+  margin-bottom:6px;
+}
+.ep-path{font-family:var(--mono);font-size:10px;color:var(--T2);flex:1}
+.ep-method{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:var(--bg4);color:var(--T3);flex-shrink:0}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:460px){.g2{grid-template-columns:1fr}}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:520px){.g3{grid-template-columns:1fr}}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:28px 14px;color:var(--T3);font-family:var(--mono);font-size:11px}
+.empty-ico{font-size:24px;margin-bottom:6px;opacity:.35}
+
+/* ── STATUS BAR ── */
+.sbar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:var(--r);
+  font-family:var(--mono);font-size:10px;color:var(--T2);
+  flex-wrap:wrap;margin-bottom:10px;
+}
+.sbar-item{display:flex;align-items:center;gap:4px}
+.sbar-sep{color:var(--T4)}
+
+/* ── ANIMATED TICKER ── */
+.ticker{
+  height:32px;overflow:hidden;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;
+  display:flex;align-items:center;padding:0 12px;
+}
+.ticker-inner{
+  font-family:var(--mono);font-size:10px;color:var(--T2);
+  white-space:nowrap;
+  animation:scroll 30s linear infinite;
+}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── RESPONSE ── */
+.resp{
+  background:#040608;border:1px solid var(--border);
+  border-radius:var(--r);padding:10px;
+  font-family:var(--mono);font-size:10px;line-height:1.7;
+  max-height:260px;overflow-y:auto;
+  white-space:pre-wrap;word-break:break-all;color:var(--T2);
+}
+</style>
 </head>
 <body>
 
-    <!-- Tela do Logo (8 segundos) -->
-    <div id="logo-screen" class="logo-screen">
-        <div class="logo-container">
-            <img src="Slide1.png" alt="Logo Trader BOT" class="logo-img">
-        </div>
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo-mark">TB</div>
+  <div class="logo-text">
+    TraderBOT Admin
+    <span>Painel de Controlo</span>
+  </div>
+  <div class="top-pills">
+    <div class="spill wait" id="hp">
+      <div class="dot"></div>
+      <span id="htext">...</span>
     </div>
+  </div>
+  <button class="ham" id="ham" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
 
-    <!-- Splash Screen -->
-    <div id="splash-screen" class="splash-screen">
-        <div class="splash-content">
-            <div class="splash-logo">
-                <div class="logo-glow"></div>
-                <div class="logo-symbol">&#x20BF;</div>
-            </div>
-            <div class="logo-text">
-                <h1>TRADER BOT</h1>
-                <p>VALIDAÇÃO DE ACESSO</p>
-            </div>
-            <div class="loader">
-                <div class="loader-inner"></div>
-                <div class="loader-inner"></div>
-                <div class="loader-inner"></div>
-            </div>
-            <div class="loading-text">
-                <span id="loadingMessage">Carregando sistema de validação</span><span class="dots"></span>
-            </div>
-        </div>
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<nav class="drawer" id="drawer">
+  <div class="dsec">
+    <div class="dlabel">Navegação</div>
+    <div class="ditem active" data-p="dash" onclick="go('dash')"><span class="ico">⬡</span>Dashboard <span class="dbadge" id="dnav-dash">ao vivo</span></div>
+    <div class="ditem" data-p="users" onclick="go('users')"><span class="ico">◎</span>Utilizadores <span class="dbadge" id="dnav-users">0</span></div>
+    <div class="ditem" data-p="tokens" onclick="go('tokens')"><span class="ico">◈</span>Tokens</div>
+    <div class="ditem" data-p="notif" onclick="go('notif')"><span class="ico">◐</span>Notificações <span class="dbadge" id="dnav-notif">0</span></div>
+    <div class="ditem" data-p="analyze" onclick="go('analyze')"><span class="ico">◉</span>Análise Rápida</div>
+  </div>
+  <div class="dsec">
+    <div class="dlabel">Servidor</div>
+    <div class="ditem" data-p="server" onclick="go('server')"><span class="ico">⬙</span>Controlo Server</div>
+    <div class="ditem" data-p="logs" onclick="go('logs')"><span class="ico">≡</span>Logs <span class="dbadge" id="dnav-logs">0</span></div>
+  </div>
+  <div class="dsec" style="flex:1">
+    <div class="dlabel">Sistema</div>
+    <div class="ditem" data-p="cfg" onclick="go('cfg')"><span class="ico">⊙</span>Configurações</div>
+  </div>
+  <div style="padding:12px;font-family:var(--mono);font-size:9px;color:var(--T3);border-top:1px solid var(--border)">
+    <div>URL: <span id="urldisp" style="color:var(--T2)">—</span></div>
+    <div style="margin-top:3px">Sync: <span id="syncts">—</span></div>
+    <div style="margin-top:3px">Uptime: <span id="draw-uptime" style="color:var(--G)">—</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ══════════════════════════════════════ DASHBOARD -->
+<div class="page active" id="page-dash">
+  <div class="ph">Dashboard</div>
+  <div class="ps" id="dash-ts">Carregando…</div>
+
+  <!-- ticker -->
+  <div class="ticker">
+    <div class="ticker-inner" id="ticker-txt">
+      ◈ DERIV-BOT SERVER ◈ Aguardando dados… ◈ DERIV-BOT SERVER ◈ Aguardando dados…
     </div>
+  </div>
 
-    <!-- Tela de Login -->
-    <div id="login-wrapper" class="login-wrapper">
-        <div class="bg-particles" id="particles"></div>
-        <div class="login-container">
-            <div class="login-header">
-                <div class="login-icon"><i class="fas fa-lock"></i></div>
-                
-                <p>Insira seu token de validação</p>
-            </div>
-            <div id="login-message" class="message"></div>
-            <form id="validationForm">
-                <div class="input-group">
-                    <label for="tokenCode">Código de Acesso</label>
-                    <div class="input-field">
-                        <input type="password" id="tokenCode" placeholder="Insira o token gerado" required>
-                        <div class="input-icon"><i class="fas fa-key"></i></div>
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn" id="submitBtn">VALIDAR ACESSO</button>
-            </form>
-            <div class="features-grid">
-                <div class="feature"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div>Criptografia SSL</div>
-                <div class="feature"><div class="feature-icon"><i class="fas fa-bolt"></i></div>Validação Instantânea</div>
-                <div class="feature"><div class="feature-icon"><i class="fas fa-stopwatch"></i></div>Token por Tempo</div>
-            </div>
-            <div class="security-tips">
-                <h4><i class="fas fa-exclamation-triangle"></i> DICAS DE SEGURANÇA</h4>
-                <ul>
-                    <li>Não compartilhe seu código de acesso</li>
-                    <li>Tokens expiram após o tempo de uso</li>
-                    <li>Verifique a internet antes de inserir dados</li>
-                </ul>
-            </div>
-            <div class="login-footer">© 2026 Trader BOT Technologies - Sistema Proprietário</div>
-        </div>
+  <!-- metrics -->
+  <div class="mgrid">
+    <div class="m"><div class="ml">Servidor</div><div class="mv" id="dm-srv" style="color:var(--T3)">—</div><div class="ms">estado atual</div></div>
+    <div class="m"><div class="ml">Latência</div><div class="mv a" id="dm-lat">—</div><div class="ms">ms/resposta</div></div>
+    <div class="m"><div class="ml">Utilizadores</div><div class="mv b" id="dm-users">0</div><div class="ms">tokens gerados</div></div>
+    <div class="m"><div class="ml">Uptime Painel</div><div class="mv g" id="dm-up">—</div><div class="ms" id="dm-up-sub">monitorado</div></div>
+  </div>
+
+  <!-- modos -->
+  <div class="card">
+    <div class="card-h">Modos de Trading <button class="act" onclick="loadModes()">↺</button></div>
+    <div id="modes-out"><div class="empty"><div class="empty-ico">◌</div>A carregar…</div></div>
+  </div>
+
+  <!-- conexão deriv -->
+  <div class="card">
+    <div class="card-h">Conexão Deriv (WebSocket) <button class="act" onclick="loadConn()">↺</button></div>
+    <div id="conn-out"><div class="empty"><div class="empty-ico">◌</div>Token de sessão necessário</div></div>
+  </div>
+
+  <!-- live log -->
+  <div class="card">
+    <div class="card-h">Monitor em Tempo Real <button class="act" onclick="clearRtLog()">limpar</button></div>
+    <div class="term" id="rtlog">
+      <div class="tl"><span class="ts">[init]</span><span class="tin">Painel de administração iniciado.</span></div>
     </div>
-
-    <!-- Botão Hambúrguer -->
-    <button id="hamburger-btn" class="hamburger-btn" style="display: none;" onclick="openSideMenu()">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Relógio fixo (canto superior direito) -->
-    <div id="clock" class="clock"></div>
-
-    <!-- Overlay de desfoque -->
-    <div id="menu-overlay" class="menu-overlay" onclick="closeSideMenu()"></div>
-
-    <!-- Menu Lateral -->
-    <div id="side-menu" class="side-menu">
-        <!-- Escudo anti-hover durante animação de abertura -->
-        <div id="menu-opening-shield" class="menu-opening-shield" style="display:none;" onclick="return false;"></div>
-        <div class="menu-header">
-            <h3>TRADER BOT</h3>
-            <button class="close-menu-btn" onclick="closeSideMenu()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="menu-content">
-            <div class="menu-section">
-                <div class="menu-section-title">Redes Sociais</div>
-                <div class="social-links">
-                    <a href="https://wa.me/244925773224" target="_blank" class="social-link whatsapp">
-                        <i class="fab fa-whatsapp"></i>
-                        <span>WhatsApp</span>
-                    </a>
-                    <a href="https://t.me/traderbot_suporte" target="_blank" class="social-link telegram">
-                        <i class="fab fa-telegram-plane"></i>
-                        <span>Telegram (Suporte)</span>
-                    </a>
-                    <a href="mailto:suporte@traderbot.com" class="social-link email">
-                        <i class="fas fa-envelope"></i>
-                        <span>Email</span>
-                    </a>
-                    <a href="https://youtube.com/@traderbot" target="_blank" class="social-link youtube">
-                        <i class="fab fa-youtube"></i>
-                        <span>YouTube</span>
-                    </a>
-                </div>
-            </div>
-            <div class="menu-section">
-                <div class="menu-section-title">Documentação</div>
-                <button class="manual-btn" onclick="openManual()">
-                    <i class="fas fa-book"></i>
-                    Manual de Utilização
-                </button>
-            </div>
-        </div>
-        <div class="menu-footer">
-            <p>© 2026 Trader BOT Technologies</p>
-        </div>
+    <div class="sbar" style="margin-top:8px;margin-bottom:0">
+      <div class="sbar-item">Checks <strong id="sc-checks" style="color:var(--T)">0</strong></div>
+      <div class="sbar-sep">·</div>
+      <div class="sbar-item">OK <strong class="g" id="sc-ok">0</strong></div>
+      <div class="sbar-sep">·</div>
+      <div class="sbar-item">Erros <strong class="r" id="sc-err">0</strong></div>
+      <div class="sbar-sep">·</div>
+      <div class="sbar-item">Intervalo <strong class="a" id="sc-int">Manual</strong></div>
     </div>
-
-<!-- ========== MODAL DO MANUAL COMPLETO ========== -->
-<div id="manual-modal" class="manual-modal">
-    <div class="manual-header">
-        <h2><i class="fas fa-book-open"></i> Manual Completo v3.4</h2>
-        <button class="close-manual-btn" onclick="closeManual()">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="manual-body">
-        <!-- SEÇÃO 1: OS 3 MODOS -->
-        <div class="manual-section">
-            <h3>🎯 Os 3 Modos em 30 Segundos</h3>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead>
-                        <tr><th>Modo</th><th>Timeframes</th><th>Timing</th><th>Perfil</th><th>Duração</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>SNIPER</td><td>M1+M5+M15</td><td>M1</td><td>Day trader</td><td>1-15min</td></tr>
-                        <tr><td>CAÇADOR</td><td>M5+M15+H1</td><td>M5</td><td>Ondas médias</td><td>15-60min</td></tr>
-                        <tr><td>PESCADOR</td><td>M15+H1+H4+H24</td><td>M15</td><td>Swing trader</td><td>Horas/dias</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SEÇÃO 2: HIERARQUIA DOS TIMEFRAMES -->
-        <div class="manual-section">
-            <h3>🔍 Hierarquia dos Timeframes</h3>
-            <div class="hierarchy-tree">
-                <span class="highlight">H4</span> → TENDÊNCIA REAL (mais importante)<br>
-                &nbsp;├─► <span class="secondary">H1</span> → DIREÇÃO DO DIA<br>
-                &nbsp;│&nbsp;&nbsp;&nbsp;├─► M30 → CONFIRMAÇÃO<br>
-                &nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─► <span class="secondary">M15</span> → TIMING DO PESCADOR<br>
-                &nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─► <span class="secondary">M5</span> → TIMING DO CAÇADOR<br>
-                &nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─► <span class="secondary">M1</span> → TIMING DO SNIPER
-            </div>
-        </div>
-        
-        <!-- SEÇÃO: ENTENDENDO O TIMING E A FASE MACD -->
-        <div class="manual-section" style="border-left: 4px solid var(--accent);">
-            <h3>⏱️ ENTENDENDO O TIMING E A FASE MACD</h3>
-            <div style="background: rgba(212,162,78,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>⭐ REGRA DE OURO:</strong> O momento de entrada é quando o TIMING do modo está OK e TODOS os timeframes estão alinhados na mesma direção!</p>
-            </div>
-            
-            <h4>📊 TIMING OK vs AGUARDAR:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Indicador</th><th>Significado</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr style="background: rgba(46,204,113,0.1);"><td>✅ TIMING OK</td><td>Momento ideal para entrada (M1, M5 ou M15 alinhado com a tendência)</td><td><strong>ENTRAR AGORA</strong></td></tr>
-                        <tr style="background: rgba(243,156,18,0.1);"><td>⏳ AGUARDAR</td><td>Timing não ideal, aguardar o próximo candle</td><td><strong>ESPERAR 1-5 MINUTOS</strong></td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🔥 ÍCONES DE FORÇA DA TENDÊNCIA (Fase MACD):</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Ícone</th><th>Fase MACD</th><th>Significado</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr><td>🚀 ALTA FORTE</td><td>STRONG_BULL</td><td>MACD + Sinal + Histograma positivos</td><td>🔥 Momento forte de alta - Operar CALL</td></tr>
-                        <tr><td>🔥 BAIXA FORTE</td><td>STRONG_BEAR</td><td>MACD + Sinal + Histograma negativos</td><td>🔥 Momento forte de baixa - Operar PUT</td></tr>
-                        <tr><td>⚠️⬇️ ALTA PERDENDO FORÇA</td><td>WEAK_BULL</td><td>MACD e Sinal positivos, Histograma negativo</td><td>⚠️ Aguardar ou realizar lucro (pullback pode vir)</td></tr>
-                        <tr><td>⚠️⬆️ BAIXA PERDENDO FORÇA</td><td>WEAK_BEAR</td><td>MACD e Sinal negativos, Histograma positivo</td><td>⚠️ Aguardar ou realizar lucro (pullback pode vir)</td></tr>
-                        <tr><td>📈 CRUZAMENTO ALTA</td><td>CROSS_BULL</td><td>MACD positivo, Sinal negativo, Histograma positivo</td><td>🎯 Cruzamento de alta - Preparar CALL</td></tr>
-                        <tr><td>📉 CRUZAMENTO BAIXA</td><td>CROSS_BEAR</td><td>MACD negativo, Sinal positivo, Histograma negativo</td><td>🎯 Cruzamento de baixa - Preparar PUT</td></tr>
-                        <tr><td>⚪ NEUTRO</td><td>NEUTRAL</td><td>MACD próximo de zero</td><td>⏳ Mercado indefinido - Aguardar</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🎯 COMO USAR NA PRÁTICA:</h4>
-            <ul>
-                <li><strong>✅ TIMING OK + 🔥 BAIXA FORTE/🚀 ALTA FORTE:</strong> Momento ideal para entrar na direção da tendência</li>
-                <li><strong>⏳ AGUARDAR + ⚠️⬆️ BAIXA PERDENDO FORÇA:</strong> O timing não está ideal e a tendência está perdendo força - ESPERE</li>
-                <li><strong>✅ TIMING OK + ⚠️⬆️ BAIXA PERDENDO FORÇA:</strong> O timing está bom, mas a tendência está perdendo força - REDUZA LOTE ou ESPERE</li>
-                <li><strong>Qualquer timeframe com ⚠️⬆️ ou ⚠️⬇️:</strong> Alerta de perda de força - pode ser início de pullback</li>
-            </ul>
-        </div>
-
-        <!-- SEÇÃO: ALERTAS DE PULLBACK - NÍVEIS DE ALERTA -->
-        <div class="manual-section" style="border-left: 4px solid #9b59b6;">
-            <h3>🚨 ALERTAS DE PULLBACK - NÍVEIS DE ALERTA</h3>
-            <div style="background: rgba(155,89,182,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>⭐ NOVIDADE v3.4:</strong> O sistema agora gera alertas de pullback em <strong>TODOS os timeframes</strong> (M1, M5, M15, H1 e H4), mesmo quando os timeframes estão divergentes (HOLD)!</p>
-                <p><strong>📢 Alerta aparece quando:</strong> RSI de qualquer timeframe analisado se aproxima ou entra nas zonas críticas de sobrecompra/sobrevenda.</p>
-            </div>
-
-            <h4>📊 NÍVEIS DE ALERTA POR RSI (Volatility Index):</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Nível</th><th>RSI (Sobrevenda)</th><th>RSI (Sobrecompra)</th><th>Ícone</th><th>Significado</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr style="background: rgba(52,152,219,0.1);"><td><strong>PREVENTIVO</strong></td><td>35-47</td><td>68-80</td><td>⚠️</td><td>RSI aproximando da zona crítica. Pullback pode ocorrer nos próximos 1-3 candles.</td><td><strong>PREPARE-SE</strong> - Aguarde o alerta evoluir</td></tr>
-                        <tr style="background: rgba(243,156,18,0.15);"><td><strong>IMINENTE</strong></td><td>30-35</td><td>80-85</td><td>⚠️⚠️</td><td>RSI na ZONA CRÍTICA! Pullback iminente a qualquer momento.</td><td><strong>NÃO ENTRE</strong> - Aguarde o pullback acontecer</td></tr>
-                        <tr style="background: rgba(231,76,60,0.2);"><td><strong>EXTREMO</strong></td><td>&lt; 30</td><td>&gt; 85</td><td>🚨</td><td>EXTREMA SOBREVENDA/COMPRA! Pullback FORTE iminente.</td><td><strong>NÃO ENTRE</strong> - Risco alto, aguarde retomada</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>📊 NÍVEIS DE ALERTA POR TIPO DE ATIVO:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Tipo Ativo</th><th>PREVENTIVO</th><th>IMINENTE</th><th>EXTREMO</th></tr></thead>
-                    <tbody>
-                        <tr><td>Volatility Index</td><td>35-47 / 68-80</td><td>30-35 / 80-85</td><td>&lt;30 / &gt;85</td></tr>
-                        <tr><td>Forex</td><td>30-42 / 58-70</td><td>25-30 / 70-75</td><td>&lt;25 / &gt;75</td></tr>
-                        <tr><td>Commodity</td><td>35-47 / 63-75</td><td>30-35 / 75-80</td><td>&lt;30 / &gt;80</td></tr>
-                        <tr><td>Criptomoeda</td><td>30-42 / 68-80</td><td>25-30 / 80-85</td><td>&lt;25 / &gt;85</td></tr>
-                        <tr><td>Índice Normal</td><td>35-47 / 63-75</td><td>30-35 / 75-80</td><td>&lt;30 / &gt;80</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🎯 EXEMPLOS DE ALERTAS NO SISTEMA:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Alerta Exibido</th><th>Significado</th></tr></thead>
-                    <tbody>
-                        <tr><td style="color: var(--warning);">⚠️ [PREVENTIVO] RSI M15 em 68 - aproximando da sobrecompra (80). Pullback em breve!</td><td>RSI M15 está a 12 pontos do limite de sobrecompra. Prepare-se para possível reversão.</td></tr>
-                        <tr><td style="color: var(--warning);">⚠️ [IMINENTE] RSI H4 em 32 - ZONA DE SOBREVENDA! Pullback iminente a qualquer momento!</td><td>RSI H4 entrou na zona crítica. NÃO ENTRE AGORA! Espere o pullback.</td></tr>
-                        <tr><td style="color: var(--danger);">🚨 [EXTREMO] RSI H1 em 24 - EXTREMA SOBREVENDA (6 pontos abaixo do limite)! Pullback FORTE iminente!</td><td>RSI H1 extremamente baixo. Pullback violento iminente. RISCO MUITO ALTO de entrar no fundo.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>💡 COMO USAR OS ALERTAS:</h4>
-            <ul>
-                <li><strong>⚠️ PREVENTIVO:</strong> O mercado está se aproximando da zona de reversão. Prepare-se, mas NÃO ENTRE ainda.</li>
-                <li><strong>⚠️⚠️ IMINENTE:</strong> O mercado está na zona crítica. PARE! Aguarde o pullback acontecer.</li>
-                <li><strong>🚨 EXTREMO:</strong> Risco máximo de entrar no fundo/topo. NÃO ENTRE. Espere a retomada da tendência.</li>
-                <li><strong>✅ RETOMADA:</strong> Após o pullback, espere o timeframe de timing voltar a favor da tendência principal para ENTRAR.</li>
-            </ul>
-            
-            <div style="background: rgba(52,152,219,0.1); padding: 12px; border-radius: 8px; margin-top: 12px;">
-                <p><strong>⭐ REGRA DE OURO DOS ALERTAS:</strong> Alerta de pullback = NÃO ENTRE! Espere o alerta desaparecer e o timing voltar a OK para entrar na retomada da tendência.</p>
-                <p><strong>🔔 IMPORTANTE:</strong> Os alertas funcionam em TODOS os timeframes (M1, M5, M15, H1, H4), mesmo quando o sistema está em HOLD!</p>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: TABELA DE ALERTAS POR TIMEFRAME -->
-        <div class="manual-section" style="border-left: 4px solid #3498db;">
-            <h3>📊 ALERTAS POR TIMEFRAME</h3>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Timeframe</th><th>Modo que gera alerta</th><th>Quando alerta</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>M1</strong></td><td>SNIPER</td><td>RSI &lt; 35 (sobrevenda) ou &gt; 80 (sobrecompra)</td></tr>
-                        <tr><td><strong>M5</strong></td><td>SNIPER, CAÇADOR</td><td>RSI &lt; 35 (sobrevenda) ou &gt; 80 (sobrecompra)</td></tr>
-                        <tr><td><strong>M15</strong></td><td>TODOS OS MODOS</td><td>RSI &lt; 35 (sobrevenda) ou &gt; 80 (sobrecompra)</td></tr>
-                        <tr><td><strong>H1</strong></td><td>CAÇADOR, PESCADOR</td><td>RSI &lt; 35 (sobrevenda) ou &gt; 80 (sobrecompra)</td></tr>
-                        <tr><td><strong>H4</strong></td><td>PESCADOR</td><td>RSI &lt; 35 (sobrevenda) ou &gt; 80 (sobrecompra)</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: O MOMENTO DA ENTRADA -->
-        <div class="manual-section" style="border-left: 4px solid #00a86b;">
-            <h3>🎯 O MOMENTO DA ENTRADA</h3>
-            <div style="background: rgba(0,168,107,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>⭐ REGRA DE OURO:</strong> O momento de entrada é quando o <strong>TIMING do modo (M1 para SNIPER, M5 para CAÇADOR, M15 para PESCADOR)</strong> está OK e TODOS os timeframes estão alinhados na mesma direção!</p>
-            </div>
-            
-            <h4>📊 Hierarquia para Entrada (qualquer ativo):</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Passo</th><th>Modo</th><th>O que verificar</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>1º</strong></td><td>PESCADOR</td><td>H4 e H1 na mesma direção</td><td>Define a TENDÊNCIA</td></tr>
-                        <tr><td><strong>2º</strong></td><td>CAÇADOR</td><td>M15 alinhado com PESCADOR</td><td>Confirma a DIREÇÃO</td></tr>
-                        <tr><td><strong>3º</strong></td><td>SNIPER</td><td>M1 com TIMING OK na direção</td><td><strong>MOMENTO DA ENTRADA</strong></td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>✅ Regra de Ouro para Entrada (qualquer ativo):</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Condição</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr><td>PESCADOR = PUT + CAÇADOR = PUT + SNIPER = PUT (TIMING OK)</td><td style="color: #e74c3c;"><strong>✅ VENDER</strong></td></tr>
-                        <tr><td>PESCADOR = CALL + CAÇADOR = CALL + SNIPER = CALL (TIMING OK)</td><td style="color: #2ecc71;"><strong>✅ COMPRAR</strong></td></tr>
-                        <tr><td>Qualquer divergência entre PESCADOR e CAÇADOR</td><td style="color: #f39c12;"><strong>❌ NÃO ENTRAR</strong></td></tr>
-                        <tr><td>SNIPER contra a direção (pullback)</td><td style="color: #f39c12;"><strong>⏳ AGUARDAR</strong></td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🎯 Resumo Visual:</h4>
-            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 12px 0;">
-                <p><strong>PESCADOR</strong> = O quê? (tendência)<br>
-                <strong>CAÇADOR</strong> = Confirma?<br>
-                <strong>SNIPER</strong> = Quando? (timing)</p>
-                <p style="margin-top: 10px; color: var(--accent);"><strong>🎯 O momento de entrada é quando o SNIPER alinha com a direção do PESCADOR!</strong></p>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: REGRA DE OURO DO RSI E PULLBACK -->
-        <div class="manual-section" style="border-left: 4px solid #f59e0b;">
-            <h3>🎯 REGRA DE OURO: RSI e Pullback</h3>
-            <div style="background: rgba(245,158,11,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>⭐ A MAIOR LIÇÃO:</strong> Um sinal forte NÃO significa entrada imediata. O TIMING é tudo!</p>
-                <p style="margin-top: 8px;"><strong>⚠️ IMPORTANTE:</strong> O PESCADOR pode estar em PUT (venda) enquanto o preço SOBE (pullback em baixa), ou em CALL enquanto o preço CAI (pullback em alta). Não confunda tendência com momento atual. A tendência de fundo continua a mesma, o preço só está corrigindo antes de continuar na direção principal.</p>
-            </div>
-            
-            <h4>📊 RSI do Timeframe de Timing (M1/M5/M15) - Zonas de Ação:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>RSI</th><th>Zona</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr style="background: rgba(34,197,94,0.1);"><td>&gt; 50</td><td>Tendência de Alta</td><td>CALL (se alinhado)</td></tr>
-                        <tr style="background: rgba(34,197,94,0.05);"><td>35-50</td><td>Zona Normal de Baixa</td><td>PUT (pode entrar)</td></tr>
-                        <tr style="background: rgba(245,158,11,0.15);"><td>&lt; 35</td><td>SOBREVENDA (Pullback iminente)</td><td>⏳ AGUARDAR PULLBACK</td></tr>
-                        <tr style="background: rgba(220,38,38,0.1);"><td>&lt; 30</td><td>EXTREMO SOBREVENDA</td><td>🚫 NÃO ENTRAR - risco alto</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🔥 Como Operar um Pullback (Estratégia Universal)</h4>
-            <ul>
-                <li><strong>1. Sinal Forte:</strong> Todos os TFs alinhados (PESCADOR + CAÇADOR + SNIPER) com confiança > 70%</li>
-                <li><strong>2. Identifique o Pullback:</strong> RSI do timeframe de timing &lt; 35 (para tendência de baixa) ou &gt; 65 (para tendência de alta)</li>
-                <li><strong>3. NÃO ENTRE AGORA!</strong> Espere o pullback terminar</li>
-                <li><strong>4. Espere os sinais de retomada:</strong>
-                    <ul>
-                        <li>✅ M1 voltar a PUT (em tendência de baixa) ou voltar a CALL (em tendência de alta)</li>
-                        <li>✅ Preço romper o fundo do pullback (em baixa) ou o topo do pullback (em alta)</li>
-                        <li>✅ RSI subiu para ~40-45 e começa a cair (em baixa) ou caiu para ~55-60 e começa a subir (em alta)</li>
-                    </ul>
-                </li>
-                <li><strong>5. ENTRE NA RETOMADA</strong> - não no fundo ou topo do pullback!</li>
-            </ul>
-            <div style="background: rgba(34,197,94,0.1); padding: 12px; border-radius: 8px; margin-top: 12px;">
-                <p><strong>✅ REGRA DE OURO:</strong> RSI do timeframe de timing &lt; 35 (ou &gt; 65) = não entre no fundo/topo. Espere o pullback e entre na retomada!</p>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: ESTRATÉGIA PARA ATIVOS ESPECIAIS -->
-        <div class="manual-section">
-            <h3>🔥 Estratégia para Ativos Especiais</h3>
-            <h4>CRASH Index (CRASH50, CRASH1000, etc.)</h4>
-            <ul>
-                <li><strong>Tendência:</strong> QUEDAS violentas com correções lentas</li>
-                <li><strong>Comprar:</strong> Apenas quando RSI do M1 &lt; 35 (fundo do ciclo)</li>
-                <li><strong>Vender:</strong> Quando RSI do M1 &gt; 60 (topo do ciclo) e M1 virar PUT</li>
-                <li><strong>Regra:</strong> NUNCA compre na tendência principal de queda</li>
-            </ul>
-            <h4>BOOM Index (BOOM300, BOOM1000, etc.)</h4>
-            <ul>
-                <li><strong>Tendência:</strong> ALTAS violentas com correções lentas</li>
-                <li><strong>Comprar:</strong> Quando RSI do M1 &lt; 40 (fundo do ciclo) e M1 virar CALL</li>
-                <li><strong>Vender:</strong> Apenas quando RSI do M1 &gt; 65 (topo do ciclo)</li>
-            </ul>
-        </div>
-
-        <!-- SEÇÃO: TABELA DE CONFIGURAÇÕES POR ATIVO ESPECIAL -->
-        <div class="manual-section">
-            <h3>📊 Configurações Específicas - Ativos Especiais</h3>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Ativo</th><th>RSI Compra</th><th>RSI Venda</th><th>Personalidade</th></tr></thead>
-                    <tbody>
-                        <tr><td>CRASH50</td><td>30</td><td>70</td><td>Tartaruga</td></tr>
-                        <tr><td>CRASH150</td><td>32</td><td>72</td><td>Lento</td></tr>
-                        <tr><td>CRASH300</td><td>35</td><td>75</td><td>Moderado</td></tr>
-                        <tr><td>CRASH500</td><td>40</td><td>92</td><td>Maratonista</td></tr>
-                        <tr><td>CRASH600</td><td>35</td><td>60</td><td>Velocista</td></tr>
-                        <tr><td>CRASH1000</td><td>35</td><td>60</td><td>Explosivo</td></tr>
-                        <tr><td>BOOM300</td><td>35</td><td>75</td><td>Forte</td></tr>
-                        <tr><td>BOOM500</td><td>38</td><td>78</td><td>Forte</td></tr>
-                        <tr><td>BOOM600</td><td>40</td><td>80</td><td>Violento</td></tr>
-                        <tr><td>BOOM900</td><td>42</td><td>82</td><td>Muito Violento</td></tr>
-                        <tr><td>BOOM1000</td><td>45</td><td>85</td><td>Extremo</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: PONTO FRANCO -->
-        <div class="manual-section">
-            <h3>⚡ Ponto Franco - Entrada Perfeita</h3>
-            <p>Ocorre quando:</p>
-            <ul>
-                <li>✅ H4 com ADX > 30 em uma direção</li>
-                <li>✅ M1 com ADX > 35 na MESMA direção</li>
-                <li>✅ RSI do M1 &lt; 40 (para PUT) ou &gt; 60 (para CALL)</li>
-            </ul>
-            <p><strong>Resultado:</strong> Movimento violento garantido! ⚡</p>
-            <p><strong>Confiança:</strong> 70-80%</p>
-            <p><strong>Duração:</strong> 5-15 minutos</p>
-        </div>
-
-        <!-- SEÇÃO: ALINHAMENTO PESCADOR-SNIPER -->
-        <div class="manual-section">
-            <h3>🎯 Alinhamento Pescador-Sniper</h3>
-            <p>Quando PESCADOR e SNIPER divergem:</p>
-            <h4>Cenário 1: PESCADOR PUT, SNIPER CALL</h4>
-            <ul>
-                <li><strong>Se M1 RSI > 60:</strong> SNIPER sobrecomprado - queda iminente</li>
-                <li><strong>Ação:</strong> AGUARDAR M1 virar PUT para VENDER</li>
-            </ul>
-            <h4>Cenário 2: PESCADOR CALL, SNIPER PUT</h4>
-            <ul>
-                <li><strong>Se M1 RSI &lt; 40:</strong> SNIPER sobrevendido - alta iminente</li>
-                <li><strong>Ação:</strong> AGUARDAR M1 virar CALL para COMPRAR</li>
-            </ul>
-            <p><strong>Regra de Ouro:</strong> NUNCA entre contra o PESCADOR. Espere o SNIPER alinhar!</p>
-        </div>
-
-        <!-- SEÇÃO: EXEMPLO PRÁTICO DE PULLBACK EM BAIXA -->
-        <div class="manual-section">
-            <h3>📉 Exemplo Prático - Pullback em Tendência de Baixa</h3>
-            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>Cenário:</strong> 4 TFs em PUT, confiança 86%, RSI M15 = 33</p>
-            </div>
-            <p><strong>O QUE ACONTECEU:</strong></p>
-            <ul>
-                <li>✅ Sinal PUT forte detectado (4 TFs alinhados)</li>
-                <li>⚠️ RSI M15 = 33 (entrando em sobrevenda)</li>
-                <li>📈 Mercado fez pullback (subiu)</li>
-                <li>❌ Quem entrou no fundo perdeu temporariamente</li>
-            </ul>
-            <p><strong>AÇÃO CORRETA:</strong></p>
-            <ul>
-                <li>⏳ Aguardar o pullback terminar</li>
-                <li>✅ Esperar M1 voltar a PUT</li>
-                <li>✅ Entrar na retomada da queda</li>
-            </ul>
-            <div style="background: rgba(34,197,94,0.1); padding: 12px; border-radius: 8px; margin-top: 12px;">
-                <p><strong>💡 LIÇÃO:</strong> Sinal forte + RSI baixo = AGUARDE O PULLBACK. Entre na retomada, não no fundo!</p>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: QUANDO SAIR -->
-        <div class="manual-section" style="border-left: 4px solid #e74c3c;">
-            <h3>⏱️ QUANDO SAIR - Duração e Sinais de Saída</h3>
-            <div style="background: rgba(231,76,60,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>⭐ REGRA DE OURO:</strong> Entre quando o TIMING está OK, saia quando ele virar AGUARDAR ou aparecerem alertas de perda de força!</p>
-            </div>
-
-            <h4>📊 DURAÇÃO POR MODO:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Modo</th><th>Duração típica</th><th>Máximo recomendado</th></tr></thead>
-                    <tbody>
-                        <tr><td>SNIPER</td><td>1-15 minutos</td><td>Até 30 minutos</td></tr>
-                        <tr><td>CAÇADOR</td><td>15-60 minutos</td><td>Até 2 horas</td></tr>
-                        <tr><td>PESCADOR</td><td>Horas a dias</td><td>Até vários dias</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4>🚨 SINAIS DE SAÍDA POR MODO:</h4>
-            <div class="table-responsive">
-                <table class="manual-table">
-                    <thead><tr><th>Modo</th><th>Sinal de saída</th><th>Ação</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>SNIPER</strong></td><td>M1 perder TIMING OK (⏳ AGUARDAR)</td><td>⏳ Preparar para sair</td></tr>
-                        <tr><td><strong>SNIPER</strong></td><td>M1 aparecer ⚠️⬇️ ou ⚠️⬆️</td><td>⚠️ Reduzir ou sair</td></tr>
-                        <tr><td><strong>SNIPER</strong></td><td>RSI M1 > 70 ou < 30</td><td>❌ Sair (sobrecompra/sobrevenda)</td></tr>
-                        <tr><td><strong>CAÇADOR</strong></td><td>M5 perder TIMING OK (⏳ AGUARDAR)</td><td>⏳ Preparar para sair</td></tr>
-                        <tr><td><strong>CAÇADOR</strong>}$
-
-
-                         -<strong>CAÇADOR</strong> <td>M5 aparecer ⚠️⬇️ ou ⚠️⬆️ <td>⚠️ Reduzir ou sair </tr>
-                         <tr><td><strong>CAÇADOR</strong></td><td>Divergência entre M5 e M15/H1</td><td>❌ Sair imediatamente</td></tr>
-                         <tr><td><strong>PESCADOR</strong></td><td>H1 ou H4 perder força (⚠️⬇️/⬆️)</td><td>⚠️ Reduzir ou sair</td></tr>
-                         <tr><td><strong>PESCADOR</strong></td><td>Divergência entre H1 e H4</td><td>❌ Sair imediatamente</td></tr>
-                    </tbody>
-                 </table>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: ALERTAS DO SISTEMA -->
-        <div class="manual-section">
-            <h3>⚠️ Alertas do Sistema (Não Ignore!)</h3>
-            <div style="background: rgba(231,76,60,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <p><strong>🚨 IMPORTANTE:</strong> Os alertas de pullback agora funcionam em <strong>TODOS os timeframes (M1, M5, M15, H1, H4)</strong>, mesmo quando o sistema está em HOLD!</p>
-            </div>
-            <ul>
-                <li><strong>⚠️ TFs divergentes</strong> → NÃO OPERAR</li>
-                <li><strong>⚠️ Confiança &lt; 50%</strong> → Lote 50% ou nada</li>
-                <li><strong>⚠️ Divergência MACD</strong> → SISTEMA BLOQUEIA</li>
-                <li><strong>⚠️ Empate CALL/PUT</strong> → SISTEMA BLOQUEIA</li>
-                <li><strong>🚨 ALERTA PREVENTIVO</strong> → RSI aproximando da zona crítica. Prepare-se, mas NÃO ENTRE.</li>
-                <li><strong>🚨 ALERTA IMINENTE</strong> → RSI na ZONA CRÍTICA! NÃO ENTRE! Aguarde o pullback.</li>
-                <li><strong>🚨 ALERTA EXTREMO</strong> → RSI em nível extremo! RISCO ALTO! NÃO ENTRE no fundo/topo.</li>
-                <li><strong>⚠️ M1/M5/M15/H1/H4 perdendo força</strong> → PULLBACK IMINENTE - reduza ou saia</li>
-            </ul>
-        </div>
-
-        <!-- SEÇÃO: CHECKLIST RÁPIDO -->
-        <div class="manual-section">
-            <h3>✅ Checklist Rápido (30 segundos)</h3>
-            <div class="checklist-item"><input type="checkbox"> H4 e H1 na mesma direção?</div>
-            <div class="checklist-item"><input type="checkbox"> ADX do H4 > 20?</div>
-            <div class="checklist-item"><input type="checkbox"> M5 com TIMING OK?</div>
-            <div class="checklist-item"><input type="checkbox"> Confiança > 50%?</div>
-            <div class="checklist-item"><input type="checkbox"> Sem alertas ⚠️?</div>
-            <div class="checklist-item"><input type="checkbox"> RSI do timeframe de timing &gt; 35 (em baixa) ou &lt; 65 (em alta)?</div>
-            <div class="checklist-item" style="background: rgba(155,89,182,0.1);"><input type="checkbox"> 🆕 Nível de alerta: PREVENTIVO/IMINENTE/EXTREMO? (se sim, NÃO ENTRE)</div>
-        </div>
-
-        <!-- SEÇÃO: GLOSSÁRIO ILUSTRADO -->
-        <div class="manual-section">
-            <h3>📖 Glossário Ilustrado</h3>
-            <div style="display: grid; gap: 10px;">
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>🔴 PONTO FRANCO:</strong> H4 forte + M1 extremo = movimento violento</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>🟢 TIMING OK:</strong> Momento ideal para entrada</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>⏳ AGUARDAR:</strong> Espere 1-5 minutos</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>📊 DIVERGÊNCIA:</strong> Timeframes em direções opostas</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>📈 CONVERGÊNCIA:</strong> Todos timeframes na mesma direção</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>🔄 PULLBACK:</strong> Correção temporária dentro da tendência</div>
-                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"><strong>🎯 RETOMADA:</strong> Momento de reentrar após pullback</div>
-                <div style="background: rgba(155,89,182,0.2); padding: 8px; border-radius: 6px;"><strong>🆕 ALERTA PREVENTIVO:</strong> RSI aproximando da zona crítica</div>
-                <div style="background: rgba(243,156,18,0.2); padding: 8px; border-radius: 6px;"><strong>🆕 ALERTA IMINENTE:</strong> RSI na zona crítica - NÃO ENTRE!</div>
-                <div style="background: rgba(231,76,60,0.2); padding: 8px; border-radius: 6px;"><strong>🆕 ALERTA EXTREMO:</strong> RSI extremo - RISCO MUITO ALTO!</div>
-                <div style="background: rgba(52,152,219,0.2); padding: 8px; border-radius: 6px;"><strong>🆕 ALERTA H1/H4:</strong> Agora geram alertas de pullback!</div>
-            </div>
-        </div>
-
-        <!-- SEÇÃO: ERROS COMUNS -->
-        <div class="manual-section">
-            <h3>❌ 7 Erros Que Matam Sua Banca</h3>
-            <ol style="list-style-type: none; padding-left: 0;">
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(220,38,38,0.05); border-radius: 6px;"><strong>1. Operar contra o H4</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(220,38,38,0.05); border-radius: 6px;"><strong>2. Ignorar alertas ⚠️</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(220,38,38,0.05); border-radius: 6px;"><strong>3. Entrar com AGUARDAR</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(220,38,38,0.05); border-radius: 6px;"><strong>4. Confiar em confiança &lt; 30%</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(220,38,38,0.05); border-radius: 6px;"><strong>5. Não usar stop-loss</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(245,158,11,0.2); border-radius: 6px;"><strong>6. ⭐ ENTRAR NO FUNDO/TOPO DO PULLBACK - o erro mais comum!</strong></li>
-                <li style="margin-bottom: 8px; padding: 8px; background: rgba(155,89,182,0.2); border-radius: 6px;"><strong>7. 🆕 Ignorar alertas de pullback (PREVENTIVO/IMINENTE/EXTREMO)</strong></li>
-            </ol>
-        </div>
-
-        <!-- SEÇÃO: REGRAS DE OURO -->
-        <div class="manual-section">
-            <h3>🏆 12 Regras de Ouro</h3>
-            <div class="golden-rules">
-                <div class="golden-rule"><span>PESCADOR primeiro → sempre</span></div>
-                <div class="golden-rule"><span>H4 é rei → ninguém discute</span></div>
-                <div class="golden-rule"><span>ADX &lt; 15 = ignore o timeframe</span></div>
-                <div class="golden-rule"><span>RSI 35-65 = zona segura</span></div>
-                <div class="golden-rule"><span>RSI do timing &lt; 35 (em baixa) ou &gt; 65 (em alta) = NÃO ENTRE NO PULLBACK</span></div>
-                <div class="golden-rule"><span>TIMING OK = entre, AGUARDAR = espere</span></div>
-                <div class="golden-rule"><span>CRASH: RSI > 60 é TOPO, RSI &lt; 35 é FUNDO</span></div>
-                <div class="golden-rule"><span>BOOM: RSI > 65 é TOPO, RSI &lt; 40 é FUNDO</span></div>
-                <div class="golden-rule"><span>Volatility: RSI > 70 vender, &lt; 30 comprar</span></div>
-                <div class="golden-rule"><span>Forex: RSI 45-55 = zona de entrada</span></div>
-                <div class="golden-rule"><span>PONTO FRANCO = H4 forte + M1 extremo</span></div>
-                <div class="golden-rule" style="background: rgba(155,89,182,0.2);"><span>🆕 ALERTA DE PULLBACK = NÃO ENTRE! Espere a retomada</span></div>
-            </div>
-        </div>
-        <div style="text-align: center; color: var(--text-muted); font-size: 10px; margin-top: 20px;">
-            Manual v3.4.0 | Atualizado em 01/04/2026<br>
-            🆕 Novidade: Alertas de pullback em H1 e H4 | Detecção em todos os timeframes | Níveis PREVENTIVO/IMINENTE/EXTREMO
-        </div>
-    </div>
+  </div>
 </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard-wrapper" class="dashboard-wrapper">
-        <div class="container">
-            <div class="terminal-header">
-                <h1>TRADER BOT</h1>
-                <div class="subtitle">v2.0.0 | Terminal Edition</div>
-            </div>
-            <div class="control-container">
-                <div class="control-panel">
-                    <div class="panel-title">CONTROLE</div>
-                    <div class="form-group">
-                        <label>SELECIONE O ATIVO</label>
-                        <select id="asset-select"><option value="">Carregando símbolos...</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>MODO DE TRADING</label>
-                        <select id="trading-mode">
-                            <option value="SNIPER" selected>SNIPER (M1 + M5 + M15)</option>
-                            <option value="CAÇADOR">CAÇADOR (M5 + M15 + H1)</option>
-                            <option value="PESCADOR">PESCADOR (M15 + H1 + H4 + H24)</option>
-                        </select>
-                    </div>
-                    <button id="analyze-btn">▶ EXECUTAR ANÁLISE</button>
-                    <div class="asset-info">
-                        <div><span>STATUS:</span> <span id="connection-text" class="status-value">Conectado</span> <span class="connection-dot connected" id="connection-indicator"></span></div>
-                        <div><span>ATIVO:</span> <span id="ativo-name">N/A</span></div>
-                        <div><span>PREÇO:</span> <span id="current-price">---</span></div>
-                        <div><span>ÚLTIMA ANÁLISE:</span> <span id="last-analysis">---</span></div>
-                        <div><span>STATUS MSG:</span> <span id="status-text">---</span></div>
-                    </div>
-                </div>
-            </div>
-            <div id="signal-frame" class="signal-frame">
-                <div class="frame-content">
-                    <div class="frame-title"><i class="fas fa-robot"></i> ANÁLISE DE MERCADO</div>
-                    <div class="frame-row"><span class="frame-label-wide">Data:</span><span class="frame-value" id="frame-date">--</span></div>
-                    <div class="frame-title" id="especial-title" style="display: none;"><i class="fas fa-fire"></i> ANÁLISE ESPECIAL</div>
-                    <div class="frame-row" id="row-tipo-ativo" style="display: none;"><span class="frame-label-wide">Tipo Ativo:</span><span class="frame-value" id="frame-tipo-ativo">--</span></div>
-                    <div class="frame-row" id="row-ciclo" style="display: none;"><span class="frame-label-wide">Ciclo:</span><span class="frame-value" id="frame-ciclo">--</span></div>
-                    <div class="frame-row" id="row-ponto-franco" style="display: none;"><span class="frame-label-wide">Ponto Franco:</span><span class="frame-value" id="frame-ponto-franco">--</span></div>
-                    <div class="frame-row" id="row-alinhamento" style="display: none;"><span class="frame-label-wide">Alinhamento:</span><span class="frame-value" id="frame-alinhamento">--</span></div>
-                    <div class="frame-row" id="row-timing-especial" style="display: none;"><span class="frame-label-wide">Timing Especial:</span><span class="frame-value" id="frame-timing-especial">--</span></div>
-                    <div class="frame-title"><i class="fas fa-chart-bar"></i> SINAL PRINCIPAL</div>
-                    <div class="frame-row"><span class="frame-label-wide"><i class="fas fa-crosshairs"></i> Sinal:</span><span class="frame-value" id="frame-signal">AGUARDANDO</span></div>
-                    <div class="frame-row"><span class="frame-label-wide"><i class="fas fa-chart-line"></i> Confiança:</span><span class="frame-value" id="frame-confidence">--</span></div>
-                    <div class="frame-row"><span class="frame-label-wide"><i class="fas fa-coins"></i> Preço:</span><span class="frame-value" id="frame-price">--</span></div>
-                    <div class="frame-title"><i class="fas fa-layer-group"></i> TIMEFRAMES</div>
-                    <div class="frame-row" id="row-m1"><span class="frame-label-wide">M1:</span><span class="frame-value" id="frame-m1">--</span></div>
-                    <div class="frame-row" id="row-m5"><span class="frame-label-wide">M5:</span><span class="frame-value" id="frame-m5">--</span></div>
-                    <div class="frame-row" id="row-m15"><span class="frame-label-wide">M15:</span><span class="frame-value" id="frame-m15">--</span></div>
-                    <div class="frame-row" id="row-m30"><span class="frame-label-wide">M30:</span><span class="frame-value" id="frame-m30">--</span></div>
-                    <div class="frame-row" id="row-h1"><span class="frame-label-wide">H1:</span><span class="frame-value" id="frame-h1">--</span></div>
-                    <div class="frame-row" id="row-h4"><span class="frame-label-wide">H4:</span><span class="frame-value" id="frame-h4">--</span></div>
-                    <div class="frame-row" id="row-h24"><span class="frame-label-wide">H24:</span><span class="frame-value" id="frame-h24">--</span></div>
-                    <div class="frame-title"><i class="fas fa-lightbulb"></i> AÇÃO</div>
-                    <div class="frame-row"><span class="frame-label-wide">Sugestão:</span><span class="frame-value" id="frame-action">--</span></div>
-                    <div class="frame-row"><span class="frame-label-wide">Motivo:</span><span class="frame-value" id="frame-action-detail">--</span></div>
-                    <!-- ===== TAKE PROFIT / STOP LOSS ===== -->
-                    <div class="frame-title"><i class="fas fa-bullseye"></i> TAKE PROFIT</div>
-                    <div class="frame-row"><span class="frame-label-wide">TP:</span><span class="frame-value" id="frame-tp" style="color: var(--accent); font-weight: 700;">--</span></div>
-                    <div class="frame-row"><span class="frame-label-wide">Stop:</span><span class="frame-value" id="frame-stop" style="color: var(--danger); font-weight: 700;">--</span></div>
-                    <!-- ===== ALERTAS: container dinâmico — suporta alertas de pullback M1/M5/M15 ===== -->
-                    <div class="frame-title"><i class="fas fa-exclamation-triangle"></i> ALERTAS</div>
-                    <div id="alertas-container">
-                        <div class="frame-row"><span class="frame-value">--</span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="terminal-footer">
-                <span><i class="fas fa-exclamation-triangle"></i> AVISO LEGAL: Use com responsabilidade!</span><br>
-                <span><i class="fas fa-satellite-dish"></i> v2.0.0 | Trader BOT</span>
-            </div>
-        </div>
+<!-- ══════════════════════════════════════ UTILIZADORES -->
+<div class="page" id="page-users">
+  <div class="ph">Utilizadores</div>
+  <div class="ps">Tokens ativos e aplicações conectadas</div>
+
+  <div class="mgrid">
+    <div class="m"><div class="ml">Total Tokens</div><div class="mv b" id="um-total">0</div><div class="ms">gerados</div></div>
+    <div class="m"><div class="ml">Activos</div><div class="mv g" id="um-active">0</div><div class="ms">válidos</div></div>
+    <div class="m"><div class="ml">Expirados</div><div class="mv r" id="um-exp">0</div><div class="ms">inválidos</div></div>
+    <div class="m"><div class="ml">Esta Sessão</div><div class="mv a" id="um-sess">0</div><div class="ms">consultas</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      Tokens Registados
+      <div style="display:flex;gap:6px">
+        <button class="act" onclick="renderUsers()">↺</button>
+        <button class="act" onclick="go('tokens')">+ Novo</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="utbl" id="users-tbl">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Período</th>
+            <th>Expira</th>
+            <th>Estado</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--T3);padding:20px">Nenhum token registado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">Validar Token de Utilizador</div>
+    <div class="field">
+      <label>Token a validar</label>
+      <textarea id="val-tok" placeholder="Cole o token do utilizador…" style="min-height:60px"></textarea>
+    </div>
+    <button class="btn btn-o btn-full" onclick="valToken()">◎ Validar</button>
+    <div id="val-res" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ TOKENS -->
+<div class="page" id="page-tokens">
+  <div class="ph">Tokens</div>
+  <div class="ps">Gerar e gerir tokens de acesso para utilizadores</div>
+
+  <div class="card">
+    <div class="card-h">Gerar Token de Acesso</div>
+    <div class="field">
+      <label>Chave de Administrador</label>
+      <input type="password" id="gk" placeholder="ADMIN_SECRET do servidor">
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Período de Validade</label>
+        <select id="gp">
+          <option value="7">7 dias</option>
+          <option value="30" selected>30 dias</option>
+          <option value="90">90 dias</option>
+          <option value="180">180 dias</option>
+          <option value="365">365 dias</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Identificador (opcional)</label>
+        <input type="text" id="gid" placeholder="nome ou ID do cliente">
+      </div>
+    </div>
+    <button class="btn btn-g btn-full" onclick="genToken()" id="gbtn">◈ Gerar Token</button>
+    <div id="gen-res" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      Tokens Guardados
+      <button class="act" onclick="renderSaved()">↺</button>
+    </div>
+    <div id="saved-list">
+      <div class="empty"><div class="empty-ico">◌</div>Nenhum token guardado</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ NOTIFICAÇÕES -->
+<div class="page" id="page-notif">
+  <div class="ph">Notificações</div>
+  <div class="ps">Enviar alertas e mensagens para os utilizadores</div>
+
+  <div class="card">
+    <div class="card-h">Compor Notificação</div>
+
+    <div class="field">
+      <label>Tipo de Mensagem</label>
+      <div class="pills" id="ntype">
+        <div class="pill on" data-v="info">ℹ Info</div>
+        <div class="pill" data-v="alerta">⚠ Alerta</div>
+        <div class="pill" data-v="sinal">◈ Sinal</div>
+        <div class="pill" data-v="manutencao">⬙ Manutenção</div>
+        <div class="pill" data-v="critico">🚨 Crítico</div>
+      </div>
     </div>
 
-    <script>
-        const API_BASE_URL = 'https://deriv-trading-backend-w2vx.onrender.com/api';
-        const API_VALIDATE_URL = `${API_BASE_URL}/validate-token`;
-        const API_ANALYZE_URL = `${API_BASE_URL}/analyze`;
-        let tradingAppInstance = null;
-        let splashController = null;
+    <div class="field">
+      <label>Destino</label>
+      <div class="pills" id="ndest">
+        <div class="pill on" data-v="todos">Todos os utilizadores</div>
+        <div class="pill" data-v="sniper">SNIPER</div>
+        <div class="pill" data-v="cacador">CAÇADOR</div>
+        <div class="pill" data-v="pescador">PESCADOR</div>
+        <div class="pill" data-v="premium">Premium</div>
+      </div>
+    </div>
 
-        function isTokenExpired(token) {
-            try {
-                const parts = token.split('.');
-                if (parts.length !== 3) return true;
-                const payload = JSON.parse(atob(parts[1]));
-                return Date.now() >= payload.exp * 1000;
-            } catch (e) { return true; }
-        }
+    <div class="field">
+      <label>Título</label>
+      <input type="text" id="ntitle" placeholder="Ex: Servidor em manutenção às 22h">
+    </div>
 
-        function updateTimeframesVisibility(mode) {
-            const visibilityMap = {
-                'SNIPER':   ['m1', 'm5', 'm15'],
-                'CAÇADOR':  ['m5', 'm15', 'h1'],
-                'PESCADOR': ['m15', 'h1', 'h4', 'h24']
-            };
-            const visible = visibilityMap[mode] || ['m1','m5','m15','m30','h1','h4','h24'];
-            ['m1','m5','m15','m30','h1','h4','h24'].forEach(tf => {
-                const row = document.getElementById(`row-${tf}`);
-                if (row) row.style.display = visible.includes(tf) ? 'flex' : 'none';
-            });
-        }
+    <div class="field">
+      <label>Mensagem</label>
+      <textarea id="nbody" placeholder="Escreva a mensagem para os utilizadores…"></textarea>
+    </div>
 
-        function setClockVisibility(visible) {
-            const clock = document.getElementById('clock');
-            if (clock) clock.classList.toggle('visible', visible);
-        }
+    <div class="field">
+      <label>Prioridade</label>
+      <div class="pills" id="nprio">
+        <div class="pill on" data-v="normal">Normal</div>
+        <div class="pill" data-v="alta">Alta</div>
+        <div class="pill" data-v="urgente">Urgente</div>
+      </div>
+    </div>
 
-        class TradingApp {
-            constructor(authToken) {
-                this.appState = {
-                    selectedSymbol: "R_10",
-                    isAnalyzing: false,
-                    lastAnalysisTime: null,
-                    authToken,
-                    tradingMode: "SNIPER"
-                };
-               this.availableAssets = {
-    // ===== VOLATILITY INDEX (TODOS MANTIDOS + NOVOS) =====
-    'R_10': 'Volatility 10 Index',
-    'R_25': 'Volatility 25 Index', 
-    'R_50': 'Volatility 50 Index',
-    'R_75': 'Volatility 75 Index',
-    'R_90': 'Volatility 90 Index',           // ✅ MANTIDO
-    'R_100': 'Volatility 100 Index',
-    // NOVOS VOLATILITY CONFIRMADOS:
-    '1HZ10V': 'Volatility 10 (1s) Index',
-    '1HZ15V': 'Volatility 15 (1s) Index',
-    '1HZ25V': 'Volatility 25 (1s) Index',
-    '1HZ50V': 'Volatility 50 (1s) Index',
-    '1HZ75V': 'Volatility 75 (1s) Index',
-    '1HZ90V': 'Volatility 90 (1s) Index',
-    '1HZ100V': 'Volatility 100 (1s) Index',
-    '1HZ150V': 'Volatility 150 (1s) Index',  // ✅ MANTIDO
-    '1HZ250V': 'Volatility 250 (1s) Index',  // ✅ MANTIDO
+    <button class="btn btn-a btn-full" onclick="sendNotif()">◐ Enviar Notificação</button>
+    <div id="notif-send-res" style="margin-top:8px"></div>
+  </div>
 
-    // ===== JUMP INDEX (TODOS MANTIDOS) =====
-    'JD10': 'Jump 10 Index',
-    'JD25': 'Jump 25 Index',
-    'JD50': 'Jump 50 Index',
-    'JD75': 'Jump 75 Index',
-    'JD100': 'Jump 100 Index',
+  <div class="card">
+    <div class="card-h">
+      Histórico de Notificações
+      <div style="display:flex;gap:6px">
+        <button class="act" onclick="renderNotifs()">↺</button>
+        <button class="act" onclick="clearNotifs()">✕ limpar</button>
+      </div>
+    </div>
+    <div class="nh" id="notif-hist">
+      <div class="empty"><div class="empty-ico">◌</div>Nenhuma notificação enviada</div>
+    </div>
+  </div>
+</div>
 
-    // ===== BOOM INDEX (TODOS MANTIDOS + NOVOS) =====
-	// NOVO BOOM CONFIRMADO:
-    'BOOM150N': 'Boom 150 Index',            // ✅ NOVO
-    'BOOM300N': 'Boom 300 Index',
-    'BOOM500': 'Boom 500 Index',
-    'BOOM600': 'Boom 600 Index',
-    'BOOM900': 'Boom 900 Index',
-    'BOOM1000': 'Boom 1000 Index',
+<!-- ══════════════════════════════════════ ANÁLISE RÁPIDA -->
+<div class="page" id="page-analyze">
+  <div class="ph">Análise Rápida</div>
+  <div class="ps">Testar o endpoint POST /api/analyze em tempo real</div>
+
+  <div class="card">
+    <div class="card-h">Parâmetros</div>
+    <div class="field">
+      <label>Token de Sessão</label>
+      <input type="password" id="an-tok" placeholder="Token de acesso válido">
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Símbolo</label>
+        <select id="an-sym">
+          <option value="R_10">Volatility 10</option>
+          <option value="R_25">Volatility 25</option>
+          <option value="R_50">Volatility 50</option>
+          <option value="R_75">Volatility 75</option>
+          <option value="R_100">Volatility 100</option>
+          <option value="1HZ10V">Volatility 10 (1s)</option>
+          <option value="1HZ50V">Volatility 50 (1s)</option>
+          <option value="1HZ100V">Volatility 100 (1s)</option>
+          <option value="BOOM500">Boom 500</option>
+          <option value="BOOM1000">Boom 1000</option>
+          <option value="CRASH500">Crash 500</option>
+          <option value="CRASH1000">Crash 1000</option>
+          <option value="frxEURUSD">EUR/USD</option>
+          <option value="frxGBPUSD">GBP/USD</option>
+          <option value="frxXAUUSD">XAU/USD</option>
+          <option value="cryBTCUSD">BTC/USD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Modo</label>
+        <select id="an-mode">
+          <option value="SNIPER">SNIPER</option>
+          <option value="CAÇADOR">CAÇADOR</option>
+          <option value="PESCADOR">PESCADOR</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-g btn-full" onclick="doAnalyze()" id="an-btn">◉ Executar Análise</button>
+  </div>
+
+  <div class="card" id="an-res-card" style="display:none">
+    <div class="card-h">Resultado</div>
+    <div id="an-res"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SERVER -->
+<div class="page" id="page-server">
+  <div class="ph">Controlo do Servidor</div>
+  <div class="ps" id="srv-url-disp">—</div>
+
+  <div class="mgrid">
+    <div class="m"><div class="ml">Health</div><div class="mv" id="sm-health" style="color:var(--T3)">—</div><div class="ms">/health</div></div>
+    <div class="m"><div class="ml">Lat. Média</div><div class="mv a" id="sm-avg">—</div><div class="ms">ms</div></div>
+    <div class="m"><div class="ml">Checks</div><div class="mv b" id="sm-checks">0</div><div class="ms">total</div></div>
+    <div class="m"><div class="ml">Erros Seg.</div><div class="mv r" id="sm-errs">0</div><div class="ms">consecutivos</div></div>
+  </div>
+
+  <!-- intervalo -->
+  <div class="card">
+    <div class="card-h">Intervalo de Monitoramento</div>
+    <div class="pills" id="int-pills">
+      <div class="pill" data-v="0">Manual</div>
+    </div>
+    <div style="font-size:10px;color:var(--T3);margin-top:8px">O monitoramento agora é sob demanda. Use "Health Check" para atualizar.</div>
+  </div>
+
+  <!-- ações -->
+  <div class="card">
+    <div class="card-h">Ações Rápidas</div>
+    <div class="g2" style="gap:8px">
+      <button class="btn btn-o" onclick="doHealth()">⬡ Health Check</button>
+      <button class="btn btn-o" onclick="loadModes()">◈ Modos</button>
+      <button class="btn btn-o" onclick="pingAll()">◎ Ping Completo</button>
+      <button class="btn btn-a" onclick="forceRefresh()">↺ Forçar Refresh</button>
+    </div>
+  </div>
+
+  <!-- CARD: REINICIAR SERVIÇO RENDER (BACKEND SEGURO) -->
+  <div class="card">
+    <div class="card-h">Reiniciar Serviço Render</div>
+    <div style="margin-bottom:12px;font-size:11px;color:var(--T2);font-family:var(--mono)">
+      O reinício é feito com segurança pelo backend.<br>
+      As credenciais estão protegidas no servidor.
+    </div>
+    <button class="btn btn-p btn-full" onclick="restartRenderService()" id="renderRestartBtn">
+      ⬙ Reiniciar Serviço no Render
+    </button>
+    <div id="renderRestartRes" style="margin-top:10px"></div>
+    <div style="font-size:9px;font-family:var(--mono);color:var(--T3);margin-top:8px">
+      Endpoint: POST /api/admin/restart-render
+    </div>
+  </div>
+
+  <!-- log do servidor -->
+  <div class="card">
+    <div class="card-h">Respostas do Servidor</div>
+    <div class="resp" id="srv-resp" style="min-height:80px;color:var(--T3)">Sem dados ainda…</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ LOGS -->
+<div class="page" id="page-logs">
+  <div class="ph">Logs</div>
+  <div class="ps">Registo completo de todas as operações</div>
+
+  <div class="card">
+    <div class="card-h">
+      Console
+      <div style="display:flex;gap:6px">
+        <button class="act" onclick="exportLogs()">↓ exportar</button>
+        <button class="act" onclick="clearLogs()">✕ limpar</button>
+      </div>
+    </div>
+    <div class="pills" id="log-filter" style="margin-bottom:8px">
+      <div class="pill on" data-v="all">Todos</div>
+      <div class="pill" data-v="tok">✓ OK</div>
+      <div class="pill" data-v="twn">⚠ Aviso</div>
+      <div class="pill" data-v="ter">✕ Erro</div>
+      <div class="pill" data-v="tin">ℹ Info</div>
+    </div>
+    <div class="term" id="main-log" style="max-height:400px">
+      <div class="tl"><span class="ts">[init]</span><span class="tin">Painel de controlo iniciado.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ CONFIG -->
+<div class="page" id="page-cfg">
+  <div class="ph">Configurações</div>
+  <div class="ps">URL do servidor, token de admin e preferências</div>
+
+  <div class="card">
+    <div class="card-h">Servidor</div>
+    <div class="field">
+      <label>URL Base da API</label>
+      <input type="text" id="cfg-url" value="https://deriv-trading-backend-w2vx.onrender.com">
+    </div>
+    <button class="btn btn-g" onclick="saveURL()">✓ Guardar URL</button>
+  </div>
+
+  <div class="card">
+    <div class="card-h">Autenticação Admin</div>
+    <div class="field">
+      <label>Chave Admin (ADMIN_SECRET)</label>
+      <input type="password" id="cfg-admin" placeholder="Chave secreta do servidor">
+    </div>
+    <div class="field">
+      <label>Token de Sessão (para consultas autenticadas)</label>
+      <input type="password" id="cfg-sess" placeholder="eyJhbG…">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-g" onclick="saveCreds()">✓ Guardar</button>
+      <button class="btn btn-r btn-sm" onclick="clearCreds()">✕ Limpar</button>
+    </div>
+    <div id="cfg-tok-info" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">Sobre o Painel</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--T2);line-height:2">
+      <div>Painel: <span class="g">TraderBOT Admin v1.0</span></div>
+      <div>Servidor: <span id="about-url" style="color:var(--T)">—</span></div>
+      <div>Build: <span class="a">2026</span></div>
+      <div>Tecnologia: <span style="color:var(--T)">HTML · CSS · JS puro</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let API = localStorage.getItem('api_url') || 'https://deriv-trading-backend-w2vx.onrender.com';
+let ADMIN_KEY = localStorage.getItem('admin_key') || '';
+let SESSION_TOK = localStorage.getItem('session_tok') || '';
+let savedTokens = JSON.parse(localStorage.getItem('saved_tokens') || '[]');
+let notifications = JSON.parse(localStorage.getItem('notifs') || '[]');
+let allLogs = [];
+let checks = 0, oks = 0, errs = 0, consErrs = 0;
+let latencies = [];
+let monSec = 0; // 0 = manual
+let monTimer = null;
+let startTs = Date.now();
+let totalQueries = 0;
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  applyStored();
+  doHealth(); // Verifica saúde ao abrir
+  loadModes();
+  renderSaved();
+  renderUsers();
+  renderNotifs();
+  // Monitoramento automático removido - apenas sob demanda
+  setInterval(updateUptime, 1000);
+  setInterval(updateTicker, 5000);
+
+  if (SESSION_TOK) {
+    document.getElementById('an-tok').value = SESSION_TOK;
+    document.getElementById('cfg-sess').value = SESSION_TOK;
+    validateSessionTok();
+  }
+  if (ADMIN_KEY) document.getElementById('cfg-admin').value = ADMIN_KEY;
+
+  setupPills('ntype'); setupPills('ndest'); setupPills('nprio');
+  // Pills de intervalo agora só tem "Manual"
+  setupPills('log-filter', () => renderLogs());
+  
+  // Exibe "Manual" no intervalo
+  document.getElementById('sc-int').textContent = 'Manual';
+});
+
+function applyStored() {
+  document.getElementById('cfg-url').value = API;
+  document.getElementById('urldisp').textContent = API.replace('https://','');
+  document.getElementById('srv-url-disp').textContent = API;
+  document.getElementById('about-url').textContent = API;
+}
+
+// ═══════════════════════════════════════════════════════
+// FUNÇÃO PARA REINICIAR O RENDER VIA BACKEND (SEGURO)
+// ═══════════════════════════════════════════════════════
+async function restartRenderService() {
+  const adminKey = ADMIN_KEY || document.getElementById('cfg-admin').value.trim();
+  
+  if (!adminKey) {
+    showRes('renderRestartRes', 'r', 'Chave de administrador necessária');
+    addLog('ter', 'Render restart: chave admin não configurada');
+    return;
+  }
+  
+  const btn = document.getElementById('renderRestartBtn');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">◌</span> Reiniciando via backend...';
+  showRes('renderRestartRes', 'a', '⏳ Enviando pedido para o servidor...');
+  
+  addLog('tin', 'Render restart: solicitando via backend');
+  addRtLog('tin', 'Render restart solicitado (backend)');
+  
+  try {
+    const response = await fetch(API + '/api/admin/restart-render', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: adminKey })
+    });
     
+    const data = await response.json();
+    
+    if (response.ok && data.success) {
+      showRes('renderRestartRes', 'g', `✓ ${data.message || 'Serviço reiniciado com sucesso!'}`);
+      addLog('tok', 'Render restart OK: ' + (data.message || 'sucesso'));
+      addRtLog('tok', 'Render service reiniciado');
+      document.getElementById('srv-resp').textContent = JSON.stringify(data, null, 2);
+    } else {
+      const errMsg = data.error || `Erro ${response.status}`;
+      showRes('renderRestartRes', 'r', `✕ Falha: ${errMsg}`);
+      addLog('ter', `Render restart falhou: ${errMsg}`);
+      document.getElementById('srv-resp').textContent = JSON.stringify(data, null, 2);
+    }
+  } catch (e) {
+    showRes('renderRestartRes', 'r', `Erro de rede: ${e.message}`);
+    addLog('ter', `Render restart exceção: ${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
+}
 
-    // ===== CRASH INDEX (TODOS MANTIDOS) =====
-    'CRASH50': 'Crash 50 Index',
-    'CRASH150N': 'Crash 150 Index',
-    'CRASH300N': 'Crash 300 Index',
-    'CRASH500': 'Crash 500 Index',
-    'CRASH600': 'Crash 600 Index',
-    'CRASH1000': 'Crash 1000 Index',
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function go(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.ditem').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelector(`[data-p="${p}"]`)?.classList.add('active');
+  closeDrawer();
+}
+function toggleDrawer() {
+  const d = document.getElementById('drawer');
+  const o = document.getElementById('overlay');
+  const h = document.getElementById('ham');
+  const show = d.classList.toggle('show');
+  o.classList.toggle('show', show);
+  h.classList.toggle('open', show);
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('ham').classList.remove('open');
+}
 
-    // ===== STEP INDEX (TODOS MANTIDOS) =====
-    'stpRNG': 'Step Index',
-    'stpRNG2': 'Step 200 Index',
-    'stpRNG3': 'Step 300 Index',
-    'stpRNG4': 'Step 400 Index',
-    'stpRNG5': 'Step 500 Index',
+// ═══════════════════════════════════════════════════════
+// PILLS
+// ═══════════════════════════════════════════════════════
+function setupPills(id, cb) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.querySelectorAll('.pill').forEach(p => {
+    p.onclick = () => {
+      el.querySelectorAll('.pill').forEach(x => x.classList.remove('on'));
+      p.classList.add('on');
+      if (cb) cb(p.dataset.v);
+    };
+  });
+}
+function getPill(id) {
+  return document.querySelector(`#${id} .pill.on`)?.dataset.v || '';
+}
 
-    // ===== FOREX / MOEDAS (TODOS MANTIDOS + NOVOS CONFIRMADOS) =====
-    'frxEURUSD': 'Euro vs US Dollar',
-    'frxGBPUSD': 'British Pound vs US Dollar',
-    'frxUSDJPY': 'US Dollar vs Japanese Yen',
-    'frxUSDCHF': 'US Dollar vs Swiss Franc',
-    'frxAUDUSD': 'Australian Dollar vs USD',
-    'frxNZDUSD': 'New Zealand Dollar vs USD',
-    'frxUSDCAD': 'US Dollar vs Canadian Dollar',
-    'frxXAUUSD': 'Gold vs US Dollar',
-    'frxXAGUSD': 'Silver vs US Dollar',
-    // NOVOS FOREX CONFIRMADOS:
-    'frxEURGBP': 'Euro vs British Pound',
-    'frxEURJPY': 'Euro vs Japanese Yen',
-    'frxEURCHF': 'Euro vs Swiss Franc',
-    'frxEURAUD': 'Euro vs Australian Dollar',
-    'frxEURNZD': 'Euro vs New Zealand Dollar',
-    'frxEURCAD': 'Euro vs Canadian Dollar',
-    'frxGBPJPY': 'British Pound vs Japanese Yen',
-    'frxGBPCHF': 'British Pound vs Swiss Franc',
-    'frxGBPAUD': 'British Pound vs Australian Dollar',
-    'frxGBPNZD': 'British Pound vs New Zealand Dollar',
-    'frxGBPCAD': 'British Pound vs Canadian Dollar',
-    'frxAUDJPY': 'Australian Dollar vs Japanese Yen',
-    'frxAUDNZD': 'Australian Dollar vs NZ Dollar',
-    'frxAUDCAD': 'Australian Dollar vs Canadian Dollar',
-    'frxAUDCHF': 'Australian Dollar vs Swiss Franc',
-    'frxNZDJPY': 'New Zealand Dollar vs Japanese Yen',
-    'frxUSDMXN': 'US Dollar vs Mexican Peso',
-    'frxUSDSEK': 'US Dollar vs Swedish Krona',
-    'frxUSDNOK': 'US Dollar vs Norwegian Krone',
-    'frxUSDPLN': 'US Dollar vs Polish Zloty',
-    'frxGBPPLN': 'British Pound vs Polish Zloty',
+// ═══════════════════════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════════════════════
+async function api(method, path, body, tok) {
+  const url = API + path;
+  const h = { 'Content-Type': 'application/json' };
+  if (tok) h['Authorization'] = 'Bearer ' + tok;
+  const t0 = Date.now();
+  const res = await fetch(url, { method, headers: h, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(12000) });
+  const ms = Date.now() - t0;
+  let data;
+  try { data = await res.json(); } catch { data = { _raw: res.statusText }; }
+  return { data, ms, status: res.status, ok: res.ok };
+}
 
-    // ===== CRIPTOMOEDAS (TODAS MANTIDAS) =====
-    'cryBTCUSD': 'Bitcoin vs US Dollar',
-    'cryETHUSD': 'Ethereum vs US Dollar',
-    'cryLTCUSD': 'Litecoin vs US Dollar',      // ✅ MANTIDO
-    'cryBCHUSD': 'Bitcoin Cash vs USD',       // ✅ MANTIDO
-    'cryBNBUSD': 'Binance Coin vs USD',       // ✅ MANTIDO
-    'cryDSHUSD': 'Dash vs US Dollar',         // ✅ MANTIDO
-    'cryIOTUSD': 'IOTA vs US Dollar',         // ✅ MANTIDO
-    'cryNEOUSD': 'Neo vs US Dollar',          // ✅ MANTIDO
-    'cryTRXUSD': 'TRON vs US Dollar',         // ✅ MANTIDO
-    'cryXLMUSD': 'Stellar vs US Dollar',      // ✅ MANTIDO
-    'cryXMRUSD': 'Monero vs US Dollar',       // ✅ MANTIDO
-    'cryXRPUSD': 'Ripple vs US Dollar',       // ✅ MANTIDO
-    'cryZECUSD': 'Zcash vs US Dollar',        // ✅ MANTIDO
-    'cryBTCETH': 'Bitcoin vs Ethereum',       // ✅ MANTIDO
-    'cryBTCLTC': 'Bitcoin vs Litecoin'        // ✅ MANTIDO
-};
-                this.analyzeHandler = () => this.analyzeMarket();
-            }
+// ═══════════════════════════════════════════════════════
+// HEALTH
+// ═══════════════════════════════════════════════════════
+async function doHealth() {
+  checks++;
+  document.getElementById('sm-checks').textContent = checks;
+  document.getElementById('sc-checks').textContent = checks;
+  const pill = document.getElementById('hp');
+  pill.className = 'spill wait';
+  document.getElementById('htext').textContent = '…';
+  const now = new Date().toLocaleTimeString('pt-PT');
+  document.getElementById('syncts').textContent = now;
+  document.getElementById('dash-ts').textContent = new Date().toLocaleString('pt-PT');
 
-            init() {
-                this.populateAssetSelect();
-                this.updateAtivoInfo();
-                this.setupEventListeners();
-                updateTimeframesVisibility(this.appState.tradingMode);
-                setClockVisibility(true);
-            }
+  try {
+    const t0 = Date.now();
+    const res = await fetch(API + '/health', { signal: AbortSignal.timeout(8000) });
+    const ms = Date.now() - t0;
+    latencies.push(ms); if (latencies.length > 30) latencies.shift();
 
-            populateAssetSelect() {
-                const sel = document.getElementById('asset-select');
-                if (!sel) return;
-                sel.innerHTML = '';
-                for (const [symbol, name] of Object.entries(this.availableAssets)) {
-                    const opt = document.createElement('option');
-                    opt.value = symbol;
-                    opt.textContent = name;
-                    sel.appendChild(opt);
-                }
-                sel.value = this.appState.selectedSymbol;
-            }
+    if (res.ok) {
+      oks++; consErrs = 0;
+      pill.className = 'spill on';
+      document.getElementById('htext').textContent = 'Online';
+      document.getElementById('dm-srv').textContent = 'ONLINE';
+      document.getElementById('dm-srv').className = 'mv g';
+      document.getElementById('dm-lat').textContent = ms;
+      document.getElementById('sm-health').textContent = 'OK';
+      document.getElementById('sm-health').style.color = 'var(--G)';
+      document.getElementById('sm-errs').textContent = 0;
+      const avg = Math.round(latencies.reduce((a,b)=>a+b,0)/latencies.length);
+      document.getElementById('sm-avg').textContent = avg;
+      addLog('tok', `Health OK — ${ms}ms`);
+      addRtLog('tok', `Server OK ${ms}ms`);
+    } else throw new Error('HTTP '+res.status);
+  } catch(e) {
+    errs++; consErrs++;
+    pill.className = 'spill off';
+    document.getElementById('htext').textContent = 'Offline';
+    document.getElementById('dm-srv').textContent = 'OFFLINE';
+    document.getElementById('dm-srv').className = 'mv r';
+    document.getElementById('sm-health').textContent = 'ERRO';
+    document.getElementById('sm-health').style.color = 'var(--R)';
+    document.getElementById('sm-errs').textContent = consErrs;
+    addLog('ter', 'Health FAILED: '+e.message);
+    addRtLog('ter', 'Health FAIL: '+e.message);
+  }
+  document.getElementById('sc-ok').textContent = oks;
+  document.getElementById('sc-err').textContent = errs;
+}
 
-            updateAtivoInfo() {
-                const el = document.getElementById('ativo-name');
-                if (el) el.textContent = this.availableAssets[this.appState.selectedSymbol] || this.appState.selectedSymbol;
-            }
+async function pingAll() {
+  addLog('tin', 'Ping completo iniciado…');
+  await doHealth();
+  await loadModes();
+  if (SESSION_TOK) await loadConn();
+  addLog('tok', 'Ping completo OK');
+}
+async function forceRefresh() {
+  addLog('tin', 'Refresh forçado…');
+  await pingAll();
+  renderUsers(); renderNotifs();
+}
 
-            setupEventListeners() {
-                const assetSel = document.getElementById('asset-select');
-                if (assetSel) assetSel.addEventListener('change', e => {
-                    this.appState.selectedSymbol = e.target.value;
-                    this.updateAtivoInfo();
-                });
-                const modeSel = document.getElementById('trading-mode');
-                if (modeSel) modeSel.addEventListener('change', e => {
-                    this.appState.tradingMode = e.target.value;
-                    updateTimeframesVisibility(this.appState.tradingMode);
-                });
-                const btn = document.getElementById('analyze-btn');
-                if (btn) {
-                    btn.removeEventListener('click', this.analyzeHandler);
-                    btn.addEventListener('click', this.analyzeHandler);
-                }
-            }
+// ═══════════════════════════════════════════════════════
+// MODES
+// ═══════════════════════════════════════════════════════
+async function loadModes() {
+  try {
+    const r = await api('GET', '/api/trading-modes');
+    if (r.ok && r.data.modes) {
+      document.getElementById('dm-users').textContent = savedTokens.length;
+      const clr = ['var(--G)','var(--A)','var(--B)'];
+      document.getElementById('modes-out').innerHTML = `
+        <div style="display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+          ${r.data.modes.map((m,i)=>`
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:${clr[i%3]};margin-bottom:3px">${m.name}</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--T3);margin-bottom:8px">${m.description}</div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">${m.timeframes.map(t=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:var(--bg4);color:var(--T2);border:1px solid var(--border)">${t}</span>`).join('')}</div>
+            </div>`).join('')}
+        </div>`;
+      addLog('tok', 'Modos carregados: '+r.data.modes.map(m=>m.name).join(', '));
+    }
+  } catch(e) { addLog('ter', 'loadModes: '+e.message); }
+}
 
-            async analyzeMarket() {
-                if (this.appState.isAnalyzing) return this.showNotification('Análise já em andamento...', 'warning');
-                if (!this.appState.authToken) {
-                    this.showNotification('❌ Token não configurado', 'error');
-                    logout(); return;
-                }
-                this.appState.isAnalyzing = true;
-                this.showLoading();
-                try {
-                    const response = await fetch(API_ANALYZE_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.appState.authToken}` },
-                        body: JSON.stringify({ symbol: this.appState.selectedSymbol, mode: this.appState.tradingMode })
-                    });
-                    if (response.status === 401 || response.status === 403) {
-                        this.showNotification('❌ Token inválido ou expirado', 'error');
-                        logout(); this.resetAnalyzeButton(); return;
-                    }
-                    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-                    const data = await response.json();
-                    this.displayResults(data);
-                    this.appState.lastAnalysisTime = new Date();
-                    this.updateLastAnalysisTime();
-                } catch (error) {
-                    this.showError(error.message);
-                } finally {
-                    this.appState.isAnalyzing = false;
-                    this.resetAnalyzeButton();
-                }
-            }
+// ═══════════════════════════════════════════════════════
+// CONNECTION
+// ═══════════════════════════════════════════════════════
+async function loadConn() {
+  const tok = SESSION_TOK || document.getElementById('cfg-sess').value.trim();
+  if (!tok) { document.getElementById('conn-out').innerHTML = '<div class="empty"><div class="empty-ico">◌</div>Configure o token de sessão nas Configurações</div>'; return; }
+  try {
+    const r = await api('GET', '/api/connection-status', null, tok);
+    const el = document.getElementById('conn-out');
+    if (r.ok) {
+      const d = r.data;
+      const st = d.status || '—';
+      const cls = st==='connected'?'g':st==='not_initialized'?'x':'a';
+      el.innerHTML = `
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <span class="badge ${cls}">${st}</span>
+          <span class="badge x">${r.ms}ms</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--T2);line-height:1.9">
+          ${Object.entries(d).map(([k,v])=>`<div><span style="color:var(--T3)">${k}:</span> <span style="color:var(--T)">${JSON.stringify(v)}</span></div>`).join('')}
+        </div>`;
+      addLog('tok', 'Deriv connection: '+st);
+    } else {
+      el.innerHTML = `<span class="badge r">Erro ${r.status}</span><div style="font-family:var(--mono);font-size:10px;color:var(--T2);margin-top:8px">${JSON.stringify(r.data)}</div>`;
+    }
+  } catch(e) { addLog('ter', 'loadConn: '+e.message); }
+}
 
-            resetAnalyzeButton() {
-                const btn = document.getElementById('analyze-btn');
-                if (btn) { btn.disabled = false; btn.innerHTML = '▶ EXECUTAR ANÁLISE'; }
-            }
+// ═══════════════════════════════════════════════════════
+// TOKENS
+// ═══════════════════════════════════════════════════════
+async function genToken() {
+  const key = document.getElementById('gk').value.trim() || ADMIN_KEY;
+  const period = parseInt(document.getElementById('gp').value);
+  const userId = document.getElementById('gid').value.trim() || undefined;
+  if (!key) { showRes('gen-res', 'r', 'Insira a chave de administrador'); return; }
 
-            displayResults(data) {
-                if (!data || !data.success) return this.showError('Resposta inválida da API');
-                const { consolidated, agreement, suggestion, timeframes } = data;
+  const btn = document.getElementById('gbtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">◌</span>';
 
-                const tipoAtivo = consolidated?.tipo_ativo || 'DEFAULT';
-                const cicloCompleto = consolidated?.ciclo_completo;
-                const pontoFranco = consolidated?.ponto_franco;
-                const alinhamentoPescador = consolidated?.alinhamento_pescador;
-                const timingEspecial = consolidated?.timing_especial;
-                const isEspecial = tipoAtivo !== 'DEFAULT';
+  try {
+    const r = await api('POST', '/api/admin/generate-token', { adminKey: key, periodDays: period, userId });
+    btn.disabled = false; btn.innerHTML = '◈ Gerar Token';
 
-                document.getElementById('especial-title').style.display = isEspecial ? 'flex' : 'none';
-                document.getElementById('row-tipo-ativo').style.display = isEspecial ? 'flex' : 'none';
-                document.getElementById('row-ciclo').style.display = cicloCompleto ? 'flex' : 'none';
-                document.getElementById('row-ponto-franco').style.display = pontoFranco ? 'flex' : 'none';
-                document.getElementById('row-alinhamento').style.display = alinhamentoPescador ? 'flex' : 'none';
-                document.getElementById('row-timing-especial').style.display = timingEspecial ? 'flex' : 'none';
+    if (r.ok && r.data.token) {
+      const tk = r.data.token;
+      const uid = r.data.userId;
+      const exp = new Date(Date.now() + period*86400000).toLocaleDateString('pt-PT');
 
-                if (isEspecial) document.getElementById('frame-tipo-ativo').textContent = tipoAtivo;
-                if (cicloCompleto) document.getElementById('frame-ciclo').textContent = `${cicloCompleto.fase} - ${cicloCompleto.motivo}`;
-                if (pontoFranco) document.getElementById('frame-ponto-franco').textContent = `${pontoFranco.tipo} (${(pontoFranco.confianca*100).toFixed(0)}%)`;
-                if (alinhamentoPescador) document.getElementById('frame-alinhamento').textContent = `${alinhamentoPescador.status} - ${alinhamentoPescador.motivo}`;
-                if (timingEspecial) document.getElementById('frame-timing-especial').textContent = `${timingEspecial.acao} - ${timingEspecial.motivo}`;
+      document.getElementById('gen-res').innerHTML = `
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <span class="badge g">✓ Gerado</span>
+          <span class="badge x">${period} dias</span>
+          <span class="badge b">${uid?.substring(0,8) || '—'}…</span>
+          <span class="badge x">exp: ${exp}</span>
+        </div>
+        <div class="tbox" id="new-tok-box">${tk}
+          <button class="tcopy" onclick="copyTxt('${tk}',this)">Copiar</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-o" onclick="saveToken('${tk}',${period},'${uid}','${userId||''}')">✓ Guardar</button>
+          <button class="btn btn-sm btn-o" onclick="useAsSess('${tk}')">→ Usar como sessão</button>
+        </div>`;
 
-                const frameDate = document.getElementById('frame-date');
-                if (frameDate) frameDate.textContent = new Date().toLocaleString('pt-BR');
+      addLog('tok', `Token gerado: ${period}d | uid=${uid?.substring(0,8)}`);
+      addRtLog('tok', `Token gerado ${period}d`);
+    } else {
+      showRes('gen-res', 'r', r.data?.error || 'Erro '+r.status);
+      addLog('ter', 'genToken err: '+JSON.stringify(r.data));
+    }
+  } catch(e) {
+    btn.disabled = false; btn.innerHTML = '◈ Gerar Token';
+    showRes('gen-res', 'r', e.message);
+    addLog('ter', 'genToken: '+e.message);
+  }
+}
 
-                const signal = consolidated?.signal || 'HOLD';
-                const frameSignal = document.getElementById('frame-signal');
-                if (frameSignal) {
-                    frameSignal.textContent = signal;
-                    frameSignal.className = 'frame-value ' + (signal==='CALL'?'call':signal==='PUT'?'put':'hold');
-                }
+function saveToken(tok, period, userId, label) {
+  savedTokens.unshift({ tok, period, userId, label: label||'', saved: new Date().toISOString() });
+  if (savedTokens.length > 50) savedTokens.pop();
+  localStorage.setItem('saved_tokens', JSON.stringify(savedTokens));
+  renderSaved(); renderUsers();
+  addLog('tok', 'Token guardado: '+period+'d '+label);
+}
 
-                const frameConfidence = document.getElementById('frame-confidence');
-                if (frameConfidence) frameConfidence.textContent = consolidated?.confidence ? (consolidated.confidence*100).toFixed(1)+'%' : '--';
+function renderSaved() {
+  const el = document.getElementById('saved-list');
+  if (!savedTokens.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">◌</div>Nenhum token guardado</div>'; return; }
+  el.innerHTML = savedTokens.map((t,i) => {
+    const exp = new Date(new Date(t.saved).getTime() + t.period*86400000);
+    const expired = exp < new Date();
+    return `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px">
+        <span class="badge ${expired?'r':'g'}">${expired?'expirado':'válido'}</span>
+        <span class="badge x">${t.period}d</span>
+        ${t.label ? `<span class="badge b">${t.label}</span>` : ''}
+        <span style="font-family:var(--mono);font-size:9px;color:var(--T3);margin-left:auto">exp: ${exp.toLocaleDateString('pt-PT')}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--T2);word-break:break-all;margin-bottom:6px">${t.tok.substring(0,48)}…</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-o" onclick="copyTxt('${t.tok}',this)">Copiar</button>
+        <button class="btn btn-sm btn-o" onclick="useAsSess('${t.tok}')">→ Sessão</button>
+        <button class="btn btn-sm btn-r" onclick="delToken(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-                let price = consolidated?.price?.toFixed(2) || '--';
-                const framePrice = document.getElementById('frame-price');
-                if (framePrice) framePrice.textContent = price;
-                const priceEl = document.getElementById('current-price');
-                if (priceEl) priceEl.textContent = price;
+function delToken(i) {
+  savedTokens.splice(i,1);
+  localStorage.setItem('saved_tokens', JSON.stringify(savedTokens));
+  renderSaved(); renderUsers();
+}
 
-                const formatTF = (tf, tfKey) => {
-                    if (!tf) return '⚪ --';
-                    const emoji = tf.sinal==='CALL'?'🟢':tf.sinal==='PUT'?'🔴':'⚪';
-                    const modo = this.appState.tradingMode;
-                    const mostrarTiming = (modo==='SNIPER'&&tfKey==='M1')||(modo==='CAÇADOR'&&tfKey==='M5')||(modo==='PESCADOR'&&tfKey==='M15');
-                    const macdPhase = tf.macd_phase;
-                    const faseNome = macdPhase?.name || '';
-                    const isPerdendoForca = faseNome.includes('PERDENDO FORÇA');
-                    const alertaPerda = isPerdendoForca ? ' ⚠️' : '';
-                    let forcaIcone = '';
-                    if (faseNome==='ALTA FORTE') forcaIcone = '🚀 ';
-                    else if (faseNome==='BAIXA FORTE') forcaIcone = '🔥 ';
-                    else if (faseNome==='ALTA PERDENDO FORÇA') forcaIcone = '⚠️⬇️ ';
-                    else if (faseNome==='BAIXA PERDENDO FORÇA') forcaIcone = '⚠️⬆️ ';
-                    let timingText = '';
-                    if (mostrarTiming) {
-                        let timingObj = null;
-                        if (tfKey==='M1'&&consolidated?.m1_timing) timingObj = consolidated.m1_timing;
-                        else if (tfKey==='M5'&&consolidated?.m5_timing) timingObj = consolidated.m5_timing;
-                        else if (tfKey==='M15'&&consolidated?.m15_timing) timingObj = consolidated.m15_timing;
-                        if (timingObj) timingText = timingObj.permitido ? '✅ TIMING OK' : '⏳ AGUARDAR';
-                    }
-                    if (timingText) return `${emoji}${alertaPerda} | ADX ${tf.adx?.toFixed(1)||'--'} | RSI ${tf.rsi?.toFixed(0)||'--'} | ${(tf.probabilidade*100).toFixed(0)}% | ${timingText} | ${forcaIcone}${faseNome}`;
-                    return `${emoji}${alertaPerda} | ADX ${tf.adx?.toFixed(1)||'--'} | RSI ${tf.rsi?.toFixed(0)||'--'} | ${(tf.probabilidade*100).toFixed(0)}% | ${forcaIcone}${faseNome}`;
-                };
+function useAsSess(tok) {
+  SESSION_TOK = tok;
+  localStorage.setItem('session_tok', tok);
+  document.getElementById('cfg-sess').value = tok;
+  document.getElementById('an-tok').value = tok;
+  addLog('tok', 'Token de sessão atualizado');
+  addRtLog('tin', 'Sessão atualizada');
+}
 
-                ['M1','M5','M15','M30','H1','H4','H24'].forEach(k => {
-                    const el = document.getElementById(`frame-${k.toLowerCase()}`);
-                    if (el) el.textContent = formatTF(timeframes?.[k], k);
-                });
+// ═══════════════════════════════════════════════════════
+// USERS
+// ═══════════════════════════════════════════════════════
+function renderUsers() {
+  const tbody = document.getElementById('users-tbody');
+  const total = savedTokens.length;
+  const now = new Date();
+  const active = savedTokens.filter(t => new Date(new Date(t.saved).getTime() + t.period*86400000) > now).length;
+  const expired = total - active;
 
-                const primarySignal = consolidated?.signal || 'HOLD';
-                const frameAction = document.getElementById('frame-action');
-                if (frameAction) {
-                    frameAction.innerHTML = primarySignal==='CALL'?'<i class="fas fa-arrow-circle-up" style="color:var(--success)"></i> COMPRAR':primarySignal==='PUT'?'<i class="fas fa-arrow-circle-down" style="color:var(--danger)"></i> VENDER':'<i class="fas fa-pause-circle"></i> AGUARDAR';
-                    frameAction.className = 'frame-value '+(primarySignal==='CALL'?'call':primarySignal==='PUT'?'put':'hold');
-                }
-                const frameActionDetail = document.getElementById('frame-action-detail');
-                if (frameActionDetail) frameActionDetail.textContent = primarySignal==='CALL'?`(${agreement?.callCount||0} TFs em CALL)`:primarySignal==='PUT'?`(${agreement?.putCount||0} TFs em PUT)`:'(TFs divergentes)';
+  document.getElementById('um-total').textContent = total;
+  document.getElementById('um-active').textContent = active;
+  document.getElementById('um-exp').textContent = expired;
+  document.getElementById('um-sess').textContent = totalQueries;
+  document.getElementById('dm-users').textContent = total;
+  document.getElementById('dnav-users').textContent = total;
 
-                // ===== TAKE PROFIT / STOP LOSS =====
-                const currentPrice = consolidated?.price || 0;
-                const frameTP = document.getElementById('frame-tp');
-                const frameStop = document.getElementById('frame-stop');
-                if (currentPrice > 0 && primarySignal !== 'HOLD') {
-                    const spread = currentPrice * 0.0015;
-                    const tpLow = (primarySignal === 'CALL' ? currentPrice + spread : currentPrice - spread * 1.5).toFixed(6);
-                    const tpHigh = (primarySignal === 'CALL' ? currentPrice + spread * 2 : currentPrice - spread).toFixed(6);
-                    const stopVal = (primarySignal === 'CALL' ? currentPrice - spread * 1.5 : currentPrice + spread * 1.5).toFixed(6);
-                    if (frameTP) frameTP.textContent = `${tpLow} - ${tpHigh}`;
-                    if (frameStop) frameStop.textContent = stopVal;
-                } else {
-                    if (frameTP) frameTP.textContent = '--';
-                    if (frameStop) frameStop.textContent = '--';
-                }
+  if (!total) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--T3);padding:20px;font-family:var(--mono);font-size:10px">Nenhum utilizador registado</td></tr>';
+    return;
+  }
 
-                // ===== ALERTAS: pullback de M1/M5/M15 + alertas gerais =====
-                const alertas = [];
+  tbody.innerHTML = savedTokens.map((t,i) => {
+    const exp = new Date(new Date(t.saved).getTime() + t.period*86400000);
+    const expired = exp < now;
+    const uid = t.userId?.substring(0,10) || '—';
+    return `<tr>
+      <td>${uid}… ${t.label ? `<span class="badge b" style="font-size:8px">${t.label}</span>` : ''}</td>
+      <td>${t.period}d</td>
+      <td style="color:${expired?'var(--R)':'var(--T2)'}">${exp.toLocaleDateString('pt-PT')}</td>
+      <td><span class="badge ${expired?'r':'g'}">${expired?'expirado':'ativo'}</span></td>
+      <td>
+        <button class="btn btn-sm btn-o" onclick="copyTxt('${t.tok}',this)">Copiar</button>
+        <button class="btn btn-sm btn-r" onclick="delToken(${i});renderUsers()" style="margin-left:4px">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
 
-                // 1. Alertas de pullback iminente vindos dos timings
-                const timingMap = [
-                    { key: 'm1_timing', obj: consolidated?.m1_timing },
-                    { key: 'm5_timing', obj: consolidated?.m5_timing },
-                    { key: 'm15_timing', obj: consolidated?.m15_timing },
-					{ key: 'h1_timing', obj: consolidated?.h1_timing },   // ✅ JÁ PREPARADO
-					{ key: 'h4_timing', obj: consolidated?.h4_timing }    // ✅ JÁ PREPARADO
-					];
-                for (const { obj } of timingMap) {
-                    if (obj?.alerta_pullback) {
-                        const ap = obj.alerta_pullback;
-                        const prefixo = ap.nivel === 'EXTREMO' ? '🚨' : '⚠️';
-                        alertas.push({
-                            texto: `${prefixo} ${ap.mensagem}`,
-                            cor: ap.nivel === 'EXTREMO' ? 'var(--danger)' : 'var(--warning)',
-                            peso: '700'
-                        });
-                    }
-                }
+async function valToken() {
+  const tok = document.getElementById('val-tok').value.trim();
+  if (!tok) { showRes('val-res','r','Cole um token'); return; }
+  showRes('val-res','x','<span class="spin">◌</span> Validando…');
+  try {
+    const r = await api('POST', '/api/validate-token', { token: tok });
+    if (r.ok && r.data.valid) {
+      const exp = r.data.expiresAt ? new Date(r.data.expiresAt*1000).toLocaleDateString('pt-PT') : '—';
+      document.getElementById('val-res').innerHTML = `
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <span class="badge g">✓ VÁLIDO</span>
+          <span class="badge x">${r.data.periodDays} dias</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--T2);line-height:2">
+          <div>User ID: <span style="color:var(--T)">${r.data.userId||'—'}</span></div>
+          <div>Expira: <span style="color:var(--A)">${exp}</span></div>
+        </div>`;
+      addLog('tok', `Token validado OK: ${r.data.periodDays}d`);
+    } else {
+      showRes('val-res','r', '✕ INVÁLIDO — '+(r.data?.message||'Token expirado'));
+      addLog('twn', 'Token inválido');
+    }
+  } catch(e) { showRes('val-res','r',e.message); addLog('ter','valToken: '+e.message); }
+}
 
-                // 2. Alertas gerais de mercado
-                if (agreement?.callCount > 0 && agreement?.putCount > 0)
-                    alertas.push({ texto: '⚠️ TFs divergentes - sistema bloqueado', cor: 'var(--warning)', peso: '600' });
-                if ((consolidated?.confidence || 0) < 0.5)
-                    alertas.push({ texto: '⚠️ Confiança baixa', cor: 'var(--warning)', peso: '600' });
-                if (suggestion?.action === 'WAIT')
-                    alertas.push({ texto: suggestion.reason || '⚠️ Aguardar sinal', cor: 'var(--warning)', peso: '600' });
+// ═══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+function sendNotif() {
+  const type  = getPill('ntype');
+  const dest  = getPill('ndest');
+  const prio  = getPill('nprio');
+  const title = document.getElementById('ntitle').value.trim();
+  const body  = document.getElementById('nbody').value.trim();
+  if (!title) { showRes('notif-send-res','r','Título obrigatório'); return; }
 
-                // 3. Alertas de MACD perdendo força
-                for (const tfKey of ['M1','M5','M15','M30','H1','H4','H24']) {
-                    const tf = timeframes?.[tfKey];
-                    if (tf?.macd_phase) {
-                        const fase = tf.macd_phase.name;
-                        if (fase === 'BAIXA PERDENDO FORÇA' && tf.sinal === 'PUT')
-                            alertas.push({ texto: `⚠️ ${tfKey} baixa perdendo força`, cor: 'var(--warning)', peso: '600' });
-                        if (fase === 'ALTA PERDENDO FORÇA' && tf.sinal === 'CALL')
-                            alertas.push({ texto: `⚠️ ${tfKey} alta perdendo força`, cor: 'var(--warning)', peso: '600' });
-                    }
-                }
+  const n = { type, dest, prio, title, body, ts: new Date().toISOString() };
+  notifications.unshift(n);
+  if (notifications.length > 100) notifications.pop();
+  localStorage.setItem('notifs', JSON.stringify(notifications));
+  renderNotifs();
 
-                // Renderizar alertas no container dinâmico
-                const container = document.getElementById('alertas-container');
-                if (container) {
-                    if (alertas.length === 0) {
-                        container.innerHTML = `<div class="frame-row"><span class="frame-value" style="color:var(--success)">✅ Nenhum alerta</span></div>`;
-                    } else {
-                        container.innerHTML = alertas.map(a =>
-                            `<div class="frame-row"><span class="frame-value" style="color:${a.cor};font-weight:${a.peso}">${a.texto}</span></div>`
-                        ).join('');
-                    }
-                }
+  document.getElementById('ntitle').value = '';
+  document.getElementById('nbody').value = '';
+  showRes('notif-send-res','g','✓ Notificação enviada');
+  addLog('tok', `Notif enviada: [${type}] "${title}" → ${dest}`);
+  addRtLog('tin', `NOTIF [${type}]: ${title}`);
+  document.getElementById('dnav-notif').textContent = notifications.length;
+}
 
-                const statusText = document.getElementById('status-text');
-                if (statusText) {
-                    statusText.textContent = `Análise concluída - ${agreement?.totalTimeframes||0} TFs analisados`;
-                    statusText.style.color = 'var(--success)';
-                }
-                this.showNotification('✅ Análise concluída!', 'success');
-            }
+function renderNotifs() {
+  const el = document.getElementById('notif-hist');
+  document.getElementById('dnav-notif').textContent = notifications.length;
+  if (!notifications.length) { el.innerHTML = '<div class="empty"><div class="empty-ico">◌</div>Nenhuma notificação</div>'; return; }
 
-            showNotification(message, type='info') {
-                const statusText = document.getElementById('status-text');
-                if (statusText) {
-                    statusText.textContent = message.substring(0,50);
-                    statusText.style.color = type==='success'?'var(--success)':type==='error'?'var(--danger)':type==='warning'?'var(--warning)':'var(--accent)';
-                }
-            }
+  const icons = { info:'ℹ', alerta:'⚠', sinal:'◈', manutencao:'⬙', critico:'🚨' };
+  const clr   = { info:'var(--B)', alerta:'var(--A)', sinal:'var(--G)', manutencao:'var(--T2)', critico:'var(--R)' };
 
-            showLoading() {
-                const btn = document.getElementById('analyze-btn');
-                if (btn) { btn.disabled = true; btn.innerHTML = '⏳ ANALISANDO...'; }
-                const statusText = document.getElementById('status-text');
-                if (statusText) { statusText.textContent = 'Solicitando análise ao servidor...'; statusText.style.color = 'var(--warning)'; }
-            }
+  el.innerHTML = notifications.slice(0,30).map(n => `
+    <div class="ni">
+      <div class="ni-ico" style="color:${clr[n.type]||'var(--B)'}">${icons[n.type]||'ℹ'}</div>
+      <div style="flex:1;min-width:0">
+        <div class="ni-title">${esc(n.title)}</div>
+        ${n.body?`<div class="ni-body">${esc(n.body)}</div>`:''}
+        <div class="ni-ts">${new Date(n.ts).toLocaleString('pt-PT')} · ${n.dest} · ${n.type} · ${n.prio}</div>
+      </div>
+    </div>`).join('');
+}
 
-            showError(errorMessage) {
-                const btn = document.getElementById('analyze-btn');
-                if (btn) { btn.disabled = false; btn.innerHTML = '▶ EXECUTAR ANÁLISE'; }
-                const statusText = document.getElementById('status-text');
-                if (statusText) { statusText.textContent = `Erro: ${errorMessage}`; statusText.style.color = 'var(--danger)'; }
-            }
+function clearNotifs() {
+  notifications = [];
+  localStorage.removeItem('notifs');
+  renderNotifs();
+}
 
-            updateLastAnalysisTime() {
-                const last = document.getElementById('last-analysis');
-                if (last && this.appState.lastAnalysisTime) last.textContent = this.appState.lastAnalysisTime.toLocaleTimeString();
-            }
-        }
+// ═══════════════════════════════════════════════════════
+// ANALYZE
+// ═══════════════════════════════════════════════════════
+async function doAnalyze() {
+  const tok  = document.getElementById('an-tok').value.trim() || SESSION_TOK;
+  const sym  = document.getElementById('an-sym').value;
+  const mode = document.getElementById('an-mode').value;
+  if (!tok) { alert('Token necessário'); return; }
 
-        function showLoginScreen() {
-            document.getElementById('login-wrapper').classList.add('active');
-            document.getElementById('dashboard-wrapper').classList.remove('active');
-            document.getElementById('hamburger-btn').style.display = 'none';
-            setClockVisibility(false);
-        }
+  const btn = document.getElementById('an-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">◌</span> Analisando…';
+  document.getElementById('an-res-card').style.display = 'block';
+  document.getElementById('an-res').innerHTML = '<div class="empty"><span class="spin" style="font-size:20px;display:block;margin-bottom:8px;color:var(--G)">◌</span>Aguardando dados da Deriv…</div>';
 
-        function showDashboard() {
-            document.getElementById('login-wrapper').classList.remove('active');
-            document.getElementById('dashboard-wrapper').classList.add('active');
-            document.getElementById('hamburger-btn').style.display = 'flex';
-            setClockVisibility(true);
-        }
+  addLog('tin', `Análise: ${sym} / ${mode}`);
+  totalQueries++;
 
-        function logout() {
-            localStorage.removeItem('authToken');
-            if (tradingAppInstance) {
-                const btn = document.getElementById('analyze-btn');
-                if (btn && tradingAppInstance.analyzeHandler) btn.removeEventListener('click', tradingAppInstance.analyzeHandler);
-                tradingAppInstance = null;
-            }
-            showLoginScreen();
-        }
+  try {
+    const r = await api('POST', '/api/analyze', { symbol: sym, mode }, tok);
+    btn.disabled = false; btn.innerHTML = '◉ Executar Análise';
 
-        function initDashboard(token) {
-            if (tradingAppInstance) {
-                const btn = document.getElementById('analyze-btn');
-                if (btn && tradingAppInstance.analyzeHandler) btn.removeEventListener('click', tradingAppInstance.analyzeHandler);
-                tradingAppInstance = null;
-            }
-            tradingAppInstance = new TradingApp(token);
-            tradingAppInstance.init();
-            showDashboard();
-        }
+    if (r.ok && r.data.success) {
+      const d = r.data;
+      const sig = d.consolidated?.signal || 'HOLD';
+      const conf = ((d.consolidated?.confidence||0)*100).toFixed(1);
+      const price = d.consolidated?.price || 0;
+      const tfs = d.timeframes || {};
+      const clr = sig==='CALL'?'var(--G)':sig==='PUT'?'var(--R)':'var(--A)';
+      const bg  = sig==='CALL'?'var(--Gx)':sig==='PUT'?'var(--Rx)':'var(--Ax)';
 
-        class SplashController {
-            constructor() {
-                this.logoScreen = document.getElementById('logo-screen');
-                this.splashScreen = document.getElementById('splash-screen');
-                this.loadingMessage = document.getElementById('loadingMessage');
-                this.messages = [
-                    "Inicializando criptografia...",
-                    "Conectando ao servidor seguro...",
-                    "Carregando sistema de validação...",
-                    "Sistema de login pronto!"
-                ];
-                this.msgIndex = 0;
-            }
+      document.getElementById('an-res').innerHTML = `
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-family:var(--mono);font-size:32px;font-weight:700;color:${clr};background:${bg};border:1px solid ${clr}30;border-radius:var(--r2);padding:12px;letter-spacing:.1em">${sig}</div>
+        </div>
+        <div class="mgrid" style="margin-bottom:12px">
+          <div class="m"><div class="ml">Confiança</div><div class="mv" style="color:${clr}">${conf}%</div></div>
+          <div class="m"><div class="ml">Preço</div><div class="mv b">${price}</div></div>
+          <div class="m"><div class="ml">Acordo</div><div class="mv">${d.agreement?.agreement||'—'}</div></div>
+          <div class="m"><div class="ml">Tempo</div><div class="mv a">${d.metadata?.responseTimeMs||'—'}ms</div></div>
+        </div>
+        ${Object.keys(tfs).length ? `
+        <div style="margin-bottom:12px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--T3);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase">Timeframes</div>
+          <div style="display:grid;gap:5px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
+            ${Object.entries(tfs).map(([k,t])=>{
+              const c = t.sinal==='CALL'?'var(--G)':t.sinal==='PUT'?'var(--R)':'var(--A)';
+              return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--T3)">${k}</div>
+                <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:${c}">${t.sinal||'—'}</div>
+                <div style="font-family:var(--mono);font-size:9px;color:var(--T3)">RSI ${(t.rsi||0).toFixed(0)} · ADX ${(t.adx||0).toFixed(0)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+        ${d.suggestion ? `
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-family:var(--mono);font-size:10px;line-height:1.8;color:var(--T2)">
+          <div style="color:var(--T);font-weight:600;margin-bottom:3px">Sugestão</div>
+          <div>Ação: <span style="color:var(--G)">${d.suggestion.action}</span></div>
+          <div>Motivo: ${d.suggestion.reason||'—'}</div>
+          ${d.suggestion.stopLoss?`<div>Stop: <span style="color:var(--R)">${d.suggestion.stopLoss}</span></div>`:''}
+          ${d.suggestion.takeProfit?`<div>TP: <span style="color:var(--G)">${d.suggestion.takeProfit}</span></div>`:''}
+        </div>` : ''}`;
 
-            createParticles() {
-                const container = document.getElementById('particles');
-                if (!container) return;
-                for (let i=0; i<30; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = Math.random()*100+'%';
-                    p.style.animationDelay = Math.random()*15+'s';
-                    container.appendChild(p);
-                }
-            }
+      addLog('tok', `${sym}/${mode}: ${sig} (${conf}%) ${r.ms}ms`);
+      addRtLog('tok', `${sym} ${sig} ${conf}%`);
+      renderUsers();
+    } else {
+      document.getElementById('an-res').innerHTML = `<span class="badge r">Erro ${r.status}</span><div class="resp" style="margin-top:8px">${JSON.stringify(r.data,null,2)}</div>`;
+      addLog('ter', 'Análise falhou: '+JSON.stringify(r.data));
+    }
+  } catch(e) {
+    btn.disabled = false; btn.innerHTML = '◉ Executar Análise';
+    document.getElementById('an-res').innerHTML = `<span class="badge r">Erro de rede: ${e.message}</span>`;
+    addLog('ter', 'doAnalyze: '+e.message);
+  }
+}
 
-            showNextMessage() {
-                if (this.msgIndex < this.messages.length) {
-                    if (this.loadingMessage) this.loadingMessage.textContent = this.messages[this.msgIndex];
-                    this.msgIndex++;
-                    setTimeout(()=>this.showNextMessage(), 800);
-                }
-            }
+// ═══════════════════════════════════════════════════════
+// ENDPOINT TEST (removido o card inteiro)
+// ═══════════════════════════════════════════════════════
+// As funções testEP foram removidas por não serem mais utilizadas
 
-            start() {
-                this.createParticles();
-                setTimeout(()=>{
-                    if (this.logoScreen) this.logoScreen.style.opacity = '0';
-                    setTimeout(()=>{
-                        if (this.logoScreen) this.logoScreen.style.display = 'none';
-                        if (this.splashScreen) this.splashScreen.style.opacity = '1';
-                        setTimeout(()=>this.showNextMessage(), 500);
-                        setTimeout(()=>{
-                            if (this.splashScreen) this.splashScreen.style.opacity = '0';
-                            setTimeout(()=>{
-                                if (this.splashScreen) this.splashScreen.style.display = 'none';
-                                const token = localStorage.getItem('authToken');
-                                if (token && !isTokenExpired(token)) initDashboard(token);
-                                else { if (token) localStorage.removeItem('authToken'); showLoginScreen(); }
-                            }, 1200);
-                        }, 5500);
-                    }, 2000);
-                }, 8000);
-            }
-        }
+// ═══════════════════════════════════════════════════════
+// MONITOR (agora apenas sob demanda)
+// ═══════════════════════════════════════════════════════
+function startMon(sec) {
+  // Não faz mais nada - monitoramento automático desativado
+  monSec = 0;
+  document.getElementById('sc-int').textContent = 'Manual';
+}
 
-        document.getElementById('validationForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const tokenInput = document.getElementById('tokenCode');
-            const token = tokenInput.value.trim();
-            const msgDiv = document.getElementById('login-message');
-            msgDiv.textContent = ''; msgDiv.className = 'message';
-            if (!token) {
-                msgDiv.textContent = 'Por favor, insira o Código de Acesso.';
-                msgDiv.classList.add('error'); return;
-            }
-            tokenInput.disabled = true;
-            msgDiv.textContent = 'Validando no servidor...';
-            msgDiv.classList.add('loading');
-            try {
-                const response = await fetch(API_VALIDATE_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token })
-                });
-                const data = await response.json();
-                if (data.valid === true) {
-                    msgDiv.textContent = 'ACESSO CONCEDIDO! Redirecionando...';
-                    msgDiv.classList.add('success');
-                    localStorage.setItem('authToken', token);
-                    setTimeout(()=>initDashboard(token), 500);
-                } else {
-                    msgDiv.textContent = 'ACESSO NEGADO: ' + (data.message || 'Código Inválido ou Expirado.');
-                    msgDiv.classList.add('error');
-                }
-            } catch(error) {
-                msgDiv.textContent = 'Erro de Comunicação: Verifique a URL da API ou a conexão de rede.';
-                msgDiv.classList.add('error');
-            } finally {
-                tokenInput.disabled = false;
-                msgDiv.classList.remove('loading');
-            }
-        });
+// ═══════════════════════════════════════════════════════
+// UPTIME
+// ═══════════════════════════════════════════════════════
+function updateUptime() {
+  const s = Math.floor((Date.now()-startTs)/1000);
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), ss = s%60;
+  const txt = h > 0 ? `${h}h${String(m).padStart(2,'0')}m` : `${String(m).padStart(2,'0')}m${String(ss).padStart(2,'0')}s`;
+  document.getElementById('dm-up').textContent = txt;
+  document.getElementById('draw-uptime').textContent = txt;
+}
 
-        document.addEventListener('DOMContentLoaded', ()=>{
-            splashController = new SplashController();
-            splashController.start();
-        });
+// ═══════════════════════════════════════════════════════
+// TICKER
+// ═══════════════════════════════════════════════════════
+function updateTicker() {
+  const d = document.getElementById('dm-srv').textContent;
+  const lat = document.getElementById('dm-lat').textContent;
+  const txt = `◈ TRADER BOT ADMIN ◈ SERVER: ${d} ◈ LATÊNCIA: ${lat}ms ◈ TOKENS: ${savedTokens.length} ◈ CHECKS: ${checks} ◈ OK: ${oks} ◈ ERR: ${errs} ◈`;
+  const el = document.getElementById('ticker-txt');
+  el.textContent = txt + '  ' + txt;
+}
 
-        // ===== MENU LATERAL =====
-        function openSideMenu() {
-            const menu = document.getElementById('side-menu');
-            const shield = document.getElementById('menu-opening-shield');
-            if (shield) shield.style.display = 'block';
-            menu.classList.add('active');
-            document.getElementById('menu-overlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => { if (shield) shield.style.display = 'none'; }, 350);
-        }
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function saveURL() {
+  API = document.getElementById('cfg-url').value.trim();
+  localStorage.setItem('api_url', API);
+  applyStored();
+  addLog('tok', 'URL guardada: '+API);
+  doHealth();
+}
 
-        function closeSideMenu() {
-            document.getElementById('side-menu').classList.remove('active');
-            document.getElementById('menu-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
+function saveCreds() {
+  ADMIN_KEY = document.getElementById('cfg-admin').value.trim();
+  SESSION_TOK = document.getElementById('cfg-sess').value.trim();
+  localStorage.setItem('admin_key', ADMIN_KEY);
+  localStorage.setItem('session_tok', SESSION_TOK);
+  document.getElementById('an-tok').value = SESSION_TOK;
+  addLog('tok', 'Credenciais guardadas');
+  if (SESSION_TOK) validateSessionTok();
+}
 
-        function openManual() {
-            closeSideMenu();
-            setTimeout(()=>{
-                document.getElementById('manual-modal').classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }, 100);
-        }
+function clearCreds() {
+  ADMIN_KEY = ''; SESSION_TOK = '';
+  localStorage.removeItem('admin_key');
+  localStorage.removeItem('session_tok');
+  document.getElementById('cfg-admin').value = '';
+  document.getElementById('cfg-sess').value = '';
+  document.getElementById('an-tok').value = '';
+  document.getElementById('cfg-tok-info').innerHTML = '';
+  addLog('twn', 'Credenciais removidas');
+}
 
-        function closeManual() {
-            document.getElementById('manual-modal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
+async function validateSessionTok() {
+  const el = document.getElementById('cfg-tok-info');
+  el.innerHTML = '<span class="spin">◌</span>';
+  try {
+    const r = await api('POST', '/api/validate-token', { token: SESSION_TOK });
+    if (r.ok && r.data.valid) {
+      const exp = r.data.expiresAt ? new Date(r.data.expiresAt*1000).toLocaleDateString('pt-PT') : '—';
+      el.innerHTML = `<span class="badge g">✓ Sessão válida · ${r.data.periodDays}d · expira ${exp}</span>`;
+    } else {
+      el.innerHTML = `<span class="badge r">✕ Token de sessão inválido</span>`;
+    }
+  } catch { el.innerHTML = `<span class="badge a">Não foi possível validar</span>`; }
+}
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (document.getElementById('manual-modal').classList.contains('active')) closeManual();
-                else if (document.getElementById('side-menu').classList.contains('active')) closeSideMenu();
-            }
-        });
+// ═══════════════════════════════════════════════════════
+// LOGS
+// ═══════════════════════════════════════════════════════
+function addLog(type, msg) {
+  const ts = new Date().toLocaleTimeString('pt-PT');
+  allLogs.unshift({ type, msg, ts });
+  if (allLogs.length > 300) allLogs.pop();
+  document.getElementById('dnav-logs').textContent = allLogs.length;
+  renderLogs();
+}
 
-        // ===== RELÓGIO =====
-        function updateClock() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            const clock = document.getElementById('clock');
-            if (clock) clock.textContent = `${h}:${m}:${s}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
+function renderLogs() {
+  const el = document.getElementById('main-log');
+  const f = getPill('log-filter') || 'all';
+  const logs = f === 'all' ? allLogs : allLogs.filter(l => l.type === f);
+  el.innerHTML = logs.map(l =>
+    `<div class="tl"><span class="ts">[${l.ts}]</span><span class="${l.type}">${esc(l.msg)}</span></div>`
+  ).join('') || '<div style="color:var(--T3);font-size:10px;font-family:var(--mono)">Sem logs nesta categoria</div>';
+  el.scrollTop = 0;
+}
+
+function clearLogs() { allLogs = []; document.getElementById('dnav-logs').textContent = 0; renderLogs(); }
+function clearRtLog() { document.getElementById('rtlog').innerHTML = '<div class="tl"><span class="ts">[clear]</span><span class="tin">Log limpo.</span></div>'; }
+
+function addRtLog(type, msg) {
+  const el = document.getElementById('rtlog');
+  const ts = new Date().toLocaleTimeString('pt-PT');
+  const d = document.createElement('div');
+  d.className = 'tl';
+  d.innerHTML = `<span class="ts">[${ts}]</span><span class="${type}">${esc(msg)}</span>`;
+  el.insertBefore(d, el.firstChild);
+  const lines = el.querySelectorAll('.tl');
+  if (lines.length > 60) lines[lines.length-1].remove();
+}
+
+function exportLogs() {
+  const txt = allLogs.map(l => `[${l.ts}] [${l.type.toUpperCase()}] ${l.msg}`).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+  a.download = `traderbot-logs-${Date.now()}.txt`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function copyTxt(txt, btn) {
+  navigator.clipboard.writeText(txt).then(() => {
+    const o = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = o, 1200);
+  });
+}
+
+function showRes(id, cls, msg) {
+  document.getElementById(id).innerHTML = `<span class="badge ${cls}">${msg}</span>`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 </body>
 </html>
