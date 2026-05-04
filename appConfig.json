@@ -1,0 +1,6 @@
+{
+  "general": {
+    "androidClearCache": true,
+    "androidCacheMode": "no_cache"
+  }
+}
